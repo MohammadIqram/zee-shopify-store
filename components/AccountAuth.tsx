@@ -42,11 +42,41 @@ function LoginForm({ action, pending }: { action: (formData: FormData) => void; 
 function SignupForm({ action, pending }: { action: (formData: FormData) => void; pending: boolean }) {
   return <form className="mt-6 space-y-4" action={action}>
     <div className="grid grid-cols-2 gap-3 max-md:grid-cols-1"><Field id="first-name" name="firstName" label="First name" autoComplete="given-name" /><Field id="last-name" name="lastName" label="Last name" autoComplete="family-name" /></div>
-    <Field id="signup-phone" name="phone" label="Phone number" type="tel" autoComplete="tel" />
+    <PhoneField />
     <Field id="signup-email" name="email" label="Email address" type="email" autoComplete="email" />
     <Field id="signup-password" name="password" label="Password" type="password" autoComplete="new-password" />
     <SubmitButton pending={pending} label="Create account" />
   </form>;
+}
+
+const countries = [
+  ['US', '+1', '🇺🇸'],
+  ['CA', '+1', '🇨🇦'],
+  ['GB', '+44', '🇬🇧'],
+  ['AU', '+61', '🇦🇺'],
+  ['IN', '+91', '🇮🇳'],
+  ['PK', '+92', '🇵🇰'],
+  ['AE', '+971', '🇦🇪'],
+  ['SA', '+966', '🇸🇦'],
+  ['DE', '+49', '🇩🇪'],
+  ['FR', '+33', '🇫🇷'],
+  ['ES', '+34', '🇪🇸'],
+  ['IT', '+39', '🇮🇹'],
+  ['BR', '+55', '🇧🇷'],
+  ['MX', '+52', '🇲🇽'],
+  ['JP', '+81', '🇯🇵'],
+  ['CN', '+86', '🇨🇳'],
+] as const;
+
+function PhoneField() {
+  return <label className="block text-sm font-semibold text-[#263b4d]" htmlFor="signup-phone">Phone number
+    <div className="mt-2 flex h-12 border border-[#cfd5d8] focus-within:border-[#195f3d]">
+      <select className="w-[132px] shrink-0 border-0 border-r border-[#cfd5d8] bg-white px-2 text-sm font-normal outline-none" id="signup-country" name="countryCode" aria-label="Country code" defaultValue="US">
+        {countries.map(([code, prefix, flag]) => <option key={code} value={prefix}>{flag} {code} {prefix}</option>)}
+      </select>
+      <input className="min-w-0 flex-1 border-0 px-3 text-sm font-normal outline-none" id="signup-phone" name="phone" type="tel" autoComplete="tel-national" inputMode="tel" placeholder="555 123 4567" required />
+    </div>
+  </label>;
 }
 
 function Field({ id, name, label, type = 'text', autoComplete }: { id: string; name: string; label: string; type?: string; autoComplete?: string }) {

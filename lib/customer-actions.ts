@@ -1,6 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { customerSessionCookie } from '@/lib/customer-session';
 
 type ActionResult = { error?: string; success?: boolean };
@@ -84,21 +85,26 @@ export async function loginCustomer(_previousState: ActionResult, formData: Form
   const password = String(formData.get('password') || '');
   if (!email || !password) return { error: 'Enter your email and password.' };
 
+  let result: ActionResult;
   try {
-    return await signIn(email, password);
+    result = await signIn(email, password);
   } catch (error) {
     console.error('Shopify customer login failed:', error);
     return { error: error instanceof Error ? error.message : 'Unable to sign in right now.' };
   }
+  if (result.success) redirect('/');
+  return result;
 }
 
 export async function createCustomer(_previousState: ActionResult, formData: FormData): Promise<ActionResult> {
   const firstName = String(formData.get('firstName') || '').trim();
   const lastName = String(formData.get('lastName') || '').trim();
-  const phone = String(formData.get('phone') || '').trim();
+  const countryCode = String(formData.get('countryCode') || '').trim();
+  const phoneNumber = String(formData.get('phone') || '').replace(/\D/g, '');
+  const phone = `${countryCode}${phoneNumber}`;
   const email = String(formData.get('email') || '').trim().toLowerCase();
   const password = String(formData.get('password') || '');
-  if (!firstName || !lastName || !phone || !email || !password) return { error: 'Complete all fields to create your account.' };
+  if (!firstName || !lastName || !countryCode || phoneNumber.length < 7 || !email || !password) return { error: 'Enter a valid phone number and complete all fields to create your account.' };
   if (password.length < 5) return { error: 'Your password must be at least 5 characters.' };
 
   try {
@@ -107,9 +113,18 @@ export async function createCustomer(_previousState: ActionResult, formData: For
     });
     const payload = result.customerCreate;
     if (!payload.customer) return { error: payload.customerUserErrors[0]?.message || 'Unable to create your Shopify account.' };
-    return await signIn(email, password);
   } catch (error) {
     console.error('Shopify customer signup failed:', error);
     return { error: error instanceof Error ? error.message : 'Unable to create your account right now.' };
   }
+
+  let signInResult: ActionResult;
+  try {
+    signInResult = await signIn(email, password);
+  } catch (error) {
+    console.error('Shopify customer signup sign-in failed:', error);
+    return { error: error instanceof Error ? error.message : 'Unable to sign in after creating your account.' };
+  }
+  if (signInResult.success) redirect('/');
+  return signInResult;
 }
