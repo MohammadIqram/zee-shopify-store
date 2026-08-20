@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { ChevronRight } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import CategoryList from '@/components/CategoryList';
 import CollectionBrowser, { type CollectionFilter, type CollectionProduct } from '@/components/CollectionBrowser';
@@ -32,17 +33,40 @@ export default async function CollectionPage({ params }: { params: Promise<{ han
   const categories = navigation?.collections?.edges.map(({ node }) => node) || [];
 
   return (
-    <>
+    <div className="min-h-screen bg-white text-gray-900">
       <Navbar categories={categories} />
       <CategoryList categories={categories} />
-      <main className="collection-page">
-        <nav className="breadcrumbs" aria-label="Breadcrumb"><Link href="/">Home</Link><span>›</span><span>{collection.title}</span></nav>
-        <header className="collection-intro">
-          <h1>{collection.title}</h1>
-          {collection.description && <p>{collection.description}</p>}
+
+      <main className="mx-auto max-w-7xl px-6 py-8 max-md:px-4 max-md:py-5">
+        {/* Breadcrumb Navigation */}
+        <nav className="mb-6 flex items-center gap-2 text-xs font-medium text-gray-500" aria-label="Breadcrumb">
+          <Link href="/" className="transition-colors hover:text-[#195f3d]">
+            Home
+          </Link>
+          <ChevronRight className="h-3 w-3 text-gray-400" />
+          <span className="font-semibold text-gray-800" aria-current="page">
+            {collection.title}
+          </span>
+        </nav>
+
+        {/* Collection Hero Header */}
+        <header className="mb-8 border-b border-gray-100 pb-8 max-md:mb-6 max-md:pb-6">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 max-md:text-2xl">
+            {collection.title}
+          </h1>
+          {collection.description && (
+            <p className="mt-3 max-w-3xl text-sm leading-relaxed text-gray-600 max-md:mt-2 max-md:text-xs">
+              {collection.description}
+            </p>
+          )}
         </header>
-        <CollectionBrowser products={collection.products.edges.map(({ node }) => node)} filters={collection.products.filters || []} />
+
+        {/* Main Collection Browser Grid */}
+        <CollectionBrowser
+          products={collection.products.edges.map(({ node }) => node)}
+          filters={collection.products.filters || []}
+        />
       </main>
-    </>
+    </div>
   );
 }
