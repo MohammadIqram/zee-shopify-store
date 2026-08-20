@@ -37,6 +37,13 @@ interface AddressMutationData {
   customerAddressDelete?: { deletedCustomerAddressId: string | null; customerUserErrors: { message: string }[] };
 }
 
+interface CartCreateData {
+  cartCreate: {
+    cart: { checkoutUrl: string; lines: { edges: { node: { id: string } }[] } } | null;
+    userErrors: { field?: string[]; message: string }[];
+  };
+}
+
 const accessTokenMutation = `
   mutation CustomerAccessTokenCreate($input: CustomerAccessTokenCreateInput!) {
     customerAccessTokenCreate(input: $input) {
@@ -78,6 +85,15 @@ const customerAddressDeleteMutation = `
     customerAddressDelete(customerAccessToken: $customerAccessToken, id: $id) {
       deletedCustomerAddressId
       customerUserErrors { message }
+    }
+  }
+`;
+
+const cartCreateMutation = `
+  mutation CartCreate($input: CartInput!) {
+    cartCreate(input: $input) {
+      cart { checkoutUrl lines(first: 100) { edges { node { id } } } }
+      userErrors { field message }
     }
   }
 `;
@@ -148,6 +164,30 @@ export async function loginCustomer(_previousState: ActionResult, formData: Form
 export async function logoutCustomer() {
   (await cookies()).delete(customerSessionCookie);
   redirect('/account');
+}
+
+export async function createHostedCheckout(_previousState: ActionResult, formData: FormData): Promise<ActionResult> {
+  const rawLines = String(formData.get('lines') || '');
+  let lines: { merchandiseId: string; quantity: number }[];
+  try {
+    lines = JSON.parse(rawLines) as { merchandiseId: string; quantity: number }[];
+  } catch {
+    return { error: 'Your cart could not be prepared for checkout.' };
+  }
+
+  const validLines = lines.filter((line) => /^gid:\/\/shopify\/ProductVariant\//.test(line.merchandiseId) && Number.isInteger(line.quantity) && line.quantity > 0);
+  if (validLines.length === 0) return { error: 'Your cart is empty.' };
+
+  try {
+    const result = await shopifyMutation<CartCreateData>(cartCreateMutation, { input: { lines: validLines } });
+    const payload = result.cartCreate;
+    if (!payload.cart) return { error: payload.userErrors[0]?.message || 'Unable to start checkout.' };
+    redirect(payload.cart.checkoutUrl);
+  } catch (error) {
+    if (error && typeof error === 'object' && 'digest' in error && String(error.digest).startsWith('NEXT_REDIRECT')) throw error;
+    console.error('Shopify checkout creation failed:', error);
+    return { error: error instanceof Error ? error.message : 'Unable to start checkout right now.' };
+  }
 }
 
 export async function updateCustomerProfile(_previousState: ActionResult, formData: FormData): Promise<ActionResult> {

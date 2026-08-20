@@ -2,8 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useActionState } from 'react';
 import { ChevronDown, LockKeyhole, Minus, Plus } from 'lucide-react';
 import { useCart } from '@/components/CartProvider';
+import { createHostedCheckout } from '@/lib/customer-actions';
 
 const formatPrice = (amount: number, currencyCode: string) =>
   new Intl.NumberFormat('en-IN', { style: 'currency', currency: currencyCode, maximumFractionDigits: 2 }).format(amount);
@@ -89,11 +91,20 @@ export default function CartPage() {
               <textarea className="mt-4 min-h-20 w-full resize-y border border-[#dedede] p-3 text-sm outline-none focus:border-[#195f3d]" placeholder="Add a note to your order" aria-label="Order instructions" />
             </details>
             <p className="mt-8 text-[15px] text-[#263b4d]">Tax included. <u>Shipping</u> calculated at checkout</p>
-            <button className="mt-8 h-16 w-full cursor-pointer border-0 bg-[#195f3d] text-[17px] font-bold text-[#f5c400] transition-colors hover:bg-[#124b30]" type="button">Checkout</button>
+            <CheckoutForm items={items} />
             <div className="mt-10 flex items-center justify-center gap-3 border-t border-[#ededed] pt-10 text-sm font-bold text-[#263b4d]"><LockKeyhole className="h-4 w-4" /> 100% Secure Payments</div>
           </aside>
         </div>
       )}
     </main>
   );
+}
+
+function CheckoutForm({ items }: { items: { variantId: string; quantity: number }[] }) {
+  const [state, action, pending] = useActionState(createHostedCheckout, {});
+  return <form action={action}>
+    {state.error && <p className="mt-6 border border-red-200 bg-red-50 px-3 py-3 text-sm text-red-700" role="alert">{state.error}</p>}
+    <input type="hidden" name="lines" value={JSON.stringify(items.map((item) => ({ merchandiseId: item.variantId, quantity: item.quantity })))} />
+    <button className="mt-8 h-16 w-full cursor-pointer border-0 bg-[#195f3d] text-[17px] font-bold text-[#f5c400] transition-colors hover:bg-[#124b30] disabled:cursor-wait disabled:opacity-60" type="submit" disabled={pending}>{pending ? 'Preparing checkout...' : 'Checkout'}</button>
+  </form>;
 }
