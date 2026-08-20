@@ -303,13 +303,13 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
           <Link
             className="flex items-center gap-2 text-[#852128] no-underline"
             href="/"
-            aria-label="Urban Plant home"
+            aria-label="Garden by Zee home"
           >
             <span className="relative block h-10 w-6 -rotate-3 rounded-b-xl rounded-t-xl border-2 border-[#852128] before:absolute before:right-[-6px] before:top-[-6px] before:h-2.5 before:w-2.5 before:rounded-full before:border-2 before:border-[#852128] after:absolute after:bottom-1 after:left-1 after:h-3.5 after:w-2 after:-rotate-12 after:rounded-full after:bg-[#195f3d]" aria-hidden="true">
               <span className="absolute left-2 top-3 h-2.5 w-1.5 rotate-45 rounded-full bg-[#195f3d]" />
             </span>
             <span className="text-[27px] font-bold tracking-tight text-[#852128] leading-none">
-              urban<span className="text-[#195f3d]">plant</span>
+              garden<span className="text-[#195f3d]">byzee</span>
               <sup className="ml-0.5 text-[10px] font-normal">®</sup>
             </span>
           </Link>
