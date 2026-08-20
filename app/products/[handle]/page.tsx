@@ -1,15 +1,15 @@
 import { notFound } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import CategoryList from '@/components/CategoryList';
-import ProductDetailClient, { 
-  type ProductDetailData, 
-  type RecommendationProduct 
+import ProductDetailClient, {
+  type ProductDetailData,
+  type RecommendationProduct
 } from '@/components/ProductDetailClient';
-import { 
-  getProductQuery, 
-  getNavigationQuery, 
+import {
+  getProductQuery,
+  getNavigationQuery,
   getProductRecommendationsQuery,
-  getBestSellerProductsQuery 
+  getBestSellerProductsQuery
 } from '@/lib/queries';
 import { shopifyFetch } from '@/lib/shopify';
 import { getCustomerName } from '@/lib/customer-session';
@@ -65,8 +65,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <Navbar categories={categories} customerName={customerName} />
-      <CategoryList categories={categories} />
-      
+
       <main className="pb-16">
         <ProductDetailClient product={product} recommendations={recommendations} />
       </main>
