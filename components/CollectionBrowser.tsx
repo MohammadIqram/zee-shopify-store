@@ -66,29 +66,59 @@ function QuickViewModal({ product, onClose }: { product: CollectionProduct; onCl
   }, [onClose]);
 
   return (
-    <div className="quick-view-modal" role="dialog" aria-modal="true" aria-label={`Quick view: ${product.title}`}>
-      <button className="quick-view-backdrop" type="button" aria-label="Close quick view" onClick={onClose} />
-      <div className="quick-view-panel">
-        <button className="quick-view-close" type="button" aria-label="Close quick view" onClick={onClose}>×</button>
-        <div className="quick-view-gallery">
-          <div className="quick-view-thumbnails">
-            {product.images.edges.map(({ node }, index) => <button className={`quick-view-thumb${index === activeImageIndex ? ' is-active' : ''}`} type="button" key={node.url} aria-label={`View image ${index + 1}`} onClick={() => setActiveImageIndex(index)}><Image src={node.url} alt={node.altText || `${product.title} image ${index + 1}`} fill sizes="70px" /></button>)}
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-[30px] max-md:p-[10px]" role="dialog" aria-modal="true" aria-label={`Quick view: ${product.title}`}>
+      <button className="absolute inset-0 border-0 bg-[rgba(20,28,24,0.62)]" type="button" aria-label="Close quick view" onClick={onClose} />
+      <div className="relative z-[1] grid max-h-[calc(100vh-60px)] w-full max-w-[1365px] grid-cols-[minmax(0,1.04fr)_minmax(380px,0.96fr)] overflow-auto border border-[#ddd] bg-[#fafafa] max-md:block max-md:max-h-[calc(100vh-20px)]">
+        <button className="absolute right-[14px] top-[14px] z-[2] h-[36px] w-[36px] rounded-full border border-[#ccc] bg-white text-center text-[28px] leading-[28px] text-[#333] cursor-pointer" type="button" aria-label="Close quick view" onClick={onClose}>×</button>
+        
+        {/* Gallery */}
+        <div className="relative min-h-[600px] border-r border-[#ddd] p-[30px_29px_25px_28px] max-md:min-h-[330px] max-md:border-b max-md:border-r-0 max-md:p-[16px]">
+          <div className="absolute left-[28px] top-[30px] flex w-[70px] flex-col gap-[12px] max-md:left-[16px] max-md:top-[16px] max-md:w-[calc(100%-60px)] max-md:flex-row max-md:gap-[7px] max-md:overflow-x-auto">
+            {product.images.edges.map(({ node }, index) => (
+              <button className={`relative h-[70px] w-[70px] cursor-pointer border bg-white p-[3px] max-md:h-[45px] max-md:w-[45px] max-md:flex-[0_0_45px] ${index === activeImageIndex ? 'border-2 border-[#195f3d]' : 'border-transparent'}`} type="button" key={node.url} aria-label={`View image ${index + 1}`} onClick={() => setActiveImageIndex(index)}>
+                <Image className="object-cover" src={node.url} alt={node.altText || `${product.title} image ${index + 1}`} fill sizes="70px" />
+              </button>
+            ))}
           </div>
-          <div className="quick-view-image">{image && <Image src={image.url} alt={image.altText || product.title} fill sizes="50vw" />}</div>
-          <span className="zoom-hint">⌕ &nbsp; Roll over image to zoom in</span>
+          <div className="relative ml-[128px] h-[548px] max-md:mx-[20px] max-md:mb-0 max-md:mt-[55px] max-md:h-[270px]">
+            {image && <Image className="object-contain" src={image.url} alt={image.altText || product.title} fill sizes="(max-width: 760px) 90vw, 50vw" />}
+          </div>
+          <span className="absolute bottom-[22px] left-0 w-full text-center text-[12px] text-[#666] max-md:bottom-[8px]">⌕ &nbsp; Roll over image to zoom in</span>
         </div>
-        <div className="quick-view-details">
-          <a className="guarantee-link" href="#guarantee">30-Day Money-Back Plant Guarantee</a>
-          <p className="guarantee-copy">Plants may arrive stressed after long transit, but proper watering can help them recover. Live plants are non-refundable, but if they do not recover from transit stress despite proper care, eligible claims are refundable under our Money-Back Guarantee.</p>
-          <h2>{product.title}</h2>
-          {hasDiscount && <span className="modal-discount">Save {discount}%</span>}
-          <div className="modal-rating"><span>★★★★★</span> <small>20 reviews</small></div>
-          <hr />
-          {Object.entries(optionGroups).map(([name, values]) => <div className="option-group" key={name}><strong>{name}: &nbsp;{selectedOptions[name]}</strong><div>{values.map((value) => <button className={`option-button${selectedOptions[name] === value ? ' is-selected' : ''}`} type="button" key={value} onClick={() => setSelectedOptions((current) => ({ ...current, [name]: value }))}>{value}</button>)}</div></div>)}
-          <div className="modal-price"><strong>Price:</strong><span>{formatPrice(price.amount, price.currencyCode)}</span>{hasDiscount && <del>{formatPrice(compareAt.amount, compareAt.currencyCode)}</del>}</div>
-          <small className="tax-note">Tax included <span>Shipping calculated at checkout</span></small>
-          <div className="quantity-control"><strong>Quantity:</strong><div><button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))}>−</button><span>{quantity}</span><button type="button" onClick={() => setQuantity((value) => value + 1)}>+</button></div></div>
-          <button className="modal-add-button" type="button">Add to cart</button>
+
+        {/* Details */}
+        <div className="p-[29px_30px_34px] max-md:p-[24px_20px_26px]">
+          <a className="text-[14px] text-[#333] underline" href="#guarantee">30-Day Money-Back Plant Guarantee</a>
+          <p className="my-[30px] mb-[20px] max-w-[560px] text-[14px] leading-[1.8] max-md:my-[18px]">Plants may arrive stressed after long transit, but proper watering can help them recover. Live plants are non-refundable, but if they do not recover from transit stress despite proper care, eligible claims are refundable under our Money-Back Guarantee.</p>
+          <h2 className="mb-[15px] mt-0 text-[26px] font-bold max-md:text-[22px]">{product.title}</h2>
+          {hasDiscount && <span className="inline-block bg-[#195f3d] px-[11px] py-[5px] text-[12px] font-bold text-white">Save {discount}%</span>}
+          <div className="my-[16px] mb-[23px] text-[19px] text-[#e78032]"><span>★★★★★</span> <small className="ml-[8px] text-[13px] text-[#555]">20 reviews</small></div>
+          <hr className="mb-[26px] mt-0 border-0 border-t border-[#ddd]" />
+          {Object.entries(optionGroups).map(([name, values]) => (
+            <div className="mb-[24px] text-[14px]" key={name}>
+              <strong>{name}: &nbsp;{selectedOptions[name]}</strong>
+              <div className="mt-[12px] flex gap-[8px]">
+                {values.map((value) => (
+                  <button className={`min-h-[41px] cursor-pointer border px-[16px] text-[13px] bg-transparent ${selectedOptions[name] === value ? 'border-2 border-[#195f3d] text-[#195f3d]' : 'border-[#ccc] text-[#444]'}`} type="button" key={value} onClick={() => setSelectedOptions((current) => ({ ...current, [name]: value }))}>{value}</button>
+                ))}
+              </div>
+            </div>
+          ))}
+          <div className="mt-[28px] flex items-baseline gap-[18px]">
+            <strong>Price:</strong>
+            <span className="text-[22px] text-[#195f3d]">{formatPrice(price.amount, price.currencyCode)}</span>
+            {hasDiscount && <del className="text-[13px]">{formatPrice(compareAt.amount, compareAt.currencyCode)}</del>}
+          </div>
+          <small className="ml-[70px] mt-[6px] mb-[24px] block text-[13px] max-md:ml-0">Tax included <span className="ml-[4px] text-[#195f3d]">Shipping calculated at checkout</span></small>
+          <div className="mt-[22px] flex items-center gap-[33px] max-md:justify-between">
+            <strong>Quantity:</strong>
+            <div className="flex border border-[#ddd]">
+              <button className="flex h-[40px] min-w-[41px] cursor-pointer items-center justify-center border-0 border-r border-[#eee] bg-transparent text-[20px]" type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))}>−</button>
+              <span className="flex h-[40px] min-w-[41px] items-center justify-center border-0 border-r border-[#eee] text-[14px]">{quantity}</span>
+              <button className="flex h-[40px] min-w-[41px] cursor-pointer items-center justify-center border-0 bg-transparent text-[20px]" type="button" onClick={() => setQuantity((value) => value + 1)}>+</button>
+            </div>
+          </div>
+          <button className="mt-[26px] h-[48px] w-full cursor-pointer border-0 bg-[#195f3d] text-[14px] font-bold text-[#f5c400]" type="button">Add to cart</button>
         </div>
       </div>
     </div>
@@ -103,21 +133,25 @@ function ProductCard({ product, onQuickView }: { product: CollectionProduct; onQ
   const discount = hasDiscount ? Math.round((1 - Number(price.amount) / Number(compareAt.amount)) * 100) : 0;
 
   return (
-    <article className="collection-product-card">
-      {hasDiscount && <span className="product-discount">Save {discount}%</span>}
-      <a className="product-image-link" href={`/products/${product.handle}`}>
-        <div className="collection-product-image">
-          {image ? <Image src={image.url} alt={image.altText || product.title} fill sizes="(max-width: 760px) 90vw, 30vw" /> : <span />}
+    <article className="relative flex min-w-0 flex-col border-r border-[#ddd] p-[20px] max-md:border-b max-md:border-r-0 [&:nth-child(3n)]:border-r-0 max-md:[&:nth-child(3n)]:border-r-0">
+      {hasDiscount && <span className="absolute left-0 top-[20px] z-[1] bg-[#195f3d] px-[11px] py-[5px] text-[12px] font-bold text-white">Save {discount}%</span>}
+      <a className="group block" href={`/products/${product.handle}`}>
+        <div className="relative h-[330px] overflow-hidden rounded-br-[15px] rounded-tr-[15px] bg-[#eef2f1] max-md:h-[min(330px,78vw)]">
+          {image ? <Image className="object-cover transition-transform duration-250 ease-in-out group-hover:scale-[1.03]" src={image.url} alt={image.altText || product.title} fill sizes="(max-width: 760px) 90vw, 30vw" /> : <span />}
         </div>
       </a>
-      <h2><a href={`/products/${product.handle}`}>{product.title}</a></h2>
-      <div className="product-price">
-        <span>{formatPrice(price.amount, price.currencyCode)}</span>
-        {hasDiscount && <del>{formatPrice(compareAt.amount, compareAt.currencyCode)}</del>}
+      <h2 className="mb-[11px] mt-[21px] text-[14px] leading-[1.4] font-normal">
+        <a className="text-[#333] no-underline" href={`/products/${product.handle}`}>{product.title}</a>
+      </h2>
+      <div className="flex items-baseline gap-[16px]">
+        <span className="text-[20px] text-[#195f3d]">{formatPrice(price.amount, price.currencyCode)}</span>
+        {hasDiscount && <del className="text-[12px] text-[#555]">{formatPrice(compareAt.amount, compareAt.currencyCode)}</del>}
       </div>
-      <div className="product-rating" aria-label="No reviews yet"><span>★★★★★</span> <small>No reviews</small></div>
-      <button className="product-action" type="button">Add to cart</button>
-      <button className="quick-view" type="button" onClick={() => onQuickView(product)}>Quick view</button>
+      <div className="my-[12px] mb-[24px] text-[17px] text-[#aaa]" aria-label="No reviews yet">
+        <span className="tracking-[1px]">★★★★★</span> <small className="ml-[7px] text-[12px] tracking-normal text-[#555]">No reviews</small>
+      </div>
+      <button className="mt-auto h-[45px] cursor-pointer border border-[#195f3d] bg-[#195f3d] text-[13px] font-bold text-[#f5c400]" type="button">Add to cart</button>
+      <button className="mt-[10px] h-[45px] cursor-pointer border border-[#ddd] bg-transparent text-[13px] font-bold text-[#195f3d]" type="button" onClick={() => onQuickView(product)}>Quick view</button>
     </article>
   );
 }
@@ -137,26 +171,52 @@ export default function CollectionBrowser({ products, filters }: CollectionBrows
   const toggleFilter = (filterId: string) => setOpenFilters((current) => current.includes(filterId) ? current.filter((id) => id !== filterId) : [...current, filterId]);
 
   return (
-    <div className="collection-layout">
-      <aside className="collection-filters">
-        <h2>Filters</h2>
+    <div className="mt-0 grid grid-cols-[300px_minmax(0,1fr)] gap-[30px] max-md:block">
+      {/* Sidebar Filters */}
+      <aside className="self-start border border-[#ddd] p-[25px_27px] max-md:mt-[16px]">
+        <h2 className="mb-[23px] mt-0 text-[20px] font-bold">Filters</h2>
         {filters.map((filter) => {
           const isOpen = openFilters.includes(filter.id);
-          return <div key={filter.id}><button className="filter-heading" type="button" onClick={() => toggleFilter(filter.id)}>{filter.label} <span>{isOpen ? '⌃' : '⌄'}</span></button>{isOpen && <div className="backend-filter-values">{filter.values.map((value) => <label key={value.id}><input type="checkbox" /> <span>{value.label}</span> <small>({value.count})</small></label>)}</div>}</div>;
+          return (
+            <div key={filter.id}>
+              <button className="flex w-full cursor-pointer items-center justify-between border-0 bg-transparent py-[14px] text-left text-[14px] font-bold capitalize text-[#333]" type="button" onClick={() => toggleFilter(filter.id)}>
+                {filter.label} <span className="text-[20px]">{isOpen ? '⌃' : '⌄'}</span>
+              </button>
+              {isOpen && (
+                <div className="grid gap-[10px] py-[2px_0_14px]">
+                  {filter.values.map((value) => (
+                    <label className="flex items-center gap-[7px] text-[13px]" key={value.id}>
+                      <input className="h-[15px] w-[15px] accent-[#195f3d]" type="checkbox" /> 
+                      <span>{value.label}</span> 
+                      <small className="text-[#777]">({value.count})</small>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
         })}
       </aside>
 
-      <section className="collection-results">
-        <div className="collection-toolbar">
+      {/* Product Results */}
+      <section className="min-w-0 border border-[#ddd] max-md:mt-[16px]">
+        <div className="flex min-h-[67px] items-center justify-between gap-[34px] border-b border-[#ddd] px-[30px] text-[13px] max-md:flex-wrap max-md:items-start max-md:gap-[12px_18px] max-md:p-[16px]">
           <span>Showing 1 - {visibleProducts.length} of {products.length} products</span>
-          <label>Display: <select defaultValue="24"><option value="24">24 per page</option><option value="48">48 per page</option></select></label>
-          <label>Sort by: <select value={sort} onChange={(event) => setSort(event.target.value)}><option>Featured</option><option>Price: low to high</option><option>Price: high to low</option></select></label>
-          <span className="view-toggle">View&nbsp; <b>▦</b> <b>☷</b></span>
+          <label className="whitespace-nowrap max-md:order-3">
+            Display: <select className="border-0 bg-transparent text-[13px] text-[#333] outline-none" defaultValue="24"><option value="24">24 per page</option><option value="48">48 per page</option></select>
+          </label>
+          <label className="whitespace-nowrap">
+            Sort by: <select className="border-0 bg-transparent text-[13px] text-[#333] outline-none" value={sort} onChange={(event) => setSort(event.target.value)}><option>Featured</option><option>Price: low to high</option><option>Price: high to low</option></select>
+          </label>
+          <span className="whitespace-nowrap max-md:ml-auto">
+            View&nbsp; <b className="ml-[8px] text-[22px] font-bold text-[#555]">▦</b> <b className="ml-[8px] text-[22px] font-bold text-[#555]">☷</b>
+          </span>
         </div>
-        <div className="collection-product-grid">
+        <div className="grid grid-cols-3 max-md:grid-cols-1">
           {visibleProducts.map((product) => <ProductCard key={product.id} product={product} onQuickView={setQuickViewProduct} />)}
         </div>
       </section>
+
       {quickViewProduct && <QuickViewModal product={quickViewProduct} onClose={() => setQuickViewProduct(null)} />}
     </div>
   );
