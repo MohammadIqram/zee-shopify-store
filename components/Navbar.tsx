@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { Menu, Search, ShoppingBag, ChevronRight, ChevronDown } from 'lucide-react';
 import { useCart } from '@/components/CartProvider';
@@ -47,6 +47,96 @@ export default function Navbar({ categories, customerName }: { categories: Colle
   const [query, setQuery] = useState('');
   const [cartOpen, setCartOpen] = useState(false);
   const { items, itemCount, updateQuantity, removeItem } = useCart();
+
+  const [categoriesDropdownOpen, setCategoriesDropdownOpen] = useState(false);
+  const [activeParentIdx, setActiveParentIdx] = useState(0);
+
+  useEffect(() => {
+    if (!categoriesDropdownOpen) return;
+    const handleClose = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.categories-dropdown-container')) {
+        setCategoriesDropdownOpen(false);
+      }
+    };
+    document.addEventListener('click', handleClose);
+    return () => document.removeEventListener('click', handleClose);
+  }, [categoriesDropdownOpen]);
+
+  const hierarchy = useMemo(() => {
+    const mapping = [
+      {
+        title: 'Plants',
+        matches: ['indoor-plants', 'outdoor-plants', 'flowering-plants', 'succulents', 'bonsai', 'ferns', 'creepers', 'medicinal-plants'],
+        defaultSubs: [
+          { title: 'Indoor Plants', handle: 'indoor-plants' },
+          { title: 'Outdoor Plants', handle: 'outdoor-plants' },
+          { title: 'Flowering Plants', handle: 'flowering-plants' },
+          { title: 'Succulents', handle: 'succulents' },
+        ]
+      },
+      {
+        title: 'Seeds',
+        matches: ['vegetable-seeds', 'flower-seeds', 'herb-seeds', 'fruit-seeds', 'microgreen-seeds'],
+        defaultSubs: [
+          { title: 'Vegetable Seeds', handle: 'vegetable-seeds' },
+          { title: 'Flower Seeds', handle: 'flower-seeds' },
+          { title: 'Herb Seeds', handle: 'herb-seeds' },
+        ]
+      },
+      {
+        title: 'Pots & Planters',
+        matches: ['ceramic-pots', 'plastic-pots', 'clay-pots', 'metal-pots', 'hanging-planters', 'grow-bags'],
+        defaultSubs: [
+          { title: 'Ceramic Pots', handle: 'ceramic-pots' },
+          { title: 'Plastic Pots', handle: 'plastic-pots' },
+          { title: 'Grow Bags', handle: 'grow-bags' },
+        ]
+      },
+      {
+        title: 'Gardening Supplies',
+        matches: ['fertilizers', 'soil-manure', 'gardening-tools', 'pesticides', 'watering-cans'],
+        defaultSubs: [
+          { title: 'Fertilizers', handle: 'fertilizers' },
+          { title: 'Gardening Tools', handle: 'gardening-tools' },
+        ]
+      },
+    ];
+
+    const groupedHandles = new Set(mapping.flatMap(m => m.matches));
+
+    const result = mapping.map(parent => {
+      let subcategories = categories
+        .filter(col => parent.matches.includes(col.handle))
+        .map(col => ({ title: col.title, handle: col.handle }));
+      
+      if (subcategories.length === 0) {
+        subcategories = parent.defaultSubs;
+      }
+      
+      const parentCol = categories.find(col => col.handle === parent.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+      
+      return {
+        title: parent.title,
+        handle: parentCol?.handle || parent.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        subcategories,
+      };
+    });
+
+    const ungrouped = categories.filter(col => !groupedHandles.has(col.handle));
+    ungrouped.forEach(col => {
+      const isAlreadyParent = result.some(r => r.title.toLowerCase() === col.title.toLowerCase());
+      if (!isAlreadyParent) {
+        result.push({
+          title: col.title,
+          handle: col.handle,
+          subcategories: [],
+        });
+      }
+    });
+
+    return result;
+  }, [categories]);
   const cartTotal = items.reduce((total, item) => total + Number(item.price) * item.quantity, 0);
   const currencyCode = items[0]?.currencyCode || 'INR';
 
@@ -91,7 +181,7 @@ export default function Navbar({ categories, customerName }: { categories: Colle
 
         {/* Search Bar */}
         <form 
-          className="flex h-10 max-w-xl flex-1 items-center rounded border border-gray-300 bg-white overflow-hidden max-md:order-3 max-md:w-full max-md:max-w-none" 
+          className="relative flex h-10 max-w-xl flex-1 items-center rounded border border-gray-300 bg-white max-md:order-3 max-md:w-full max-md:max-w-none" 
           role="search" 
           onSubmit={(event) => event.preventDefault()}
         >
@@ -101,12 +191,68 @@ export default function Navbar({ categories, customerName }: { categories: Colle
             aria-label="Search products"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            className="w-full border-0 bg-transparent px-3 text-xs text-gray-800 outline-none placeholder:text-gray-400"
+            className="w-full border-0 bg-transparent px-3 text-xs text-gray-800 outline-none placeholder:text-gray-400 rounded-l"
           />
-          <button className="flex h-full items-center gap-1.5 border-0 border-l border-gray-200 bg-transparent px-3 text-xs text-gray-600 hover:text-gray-900 whitespace-nowrap max-lg:hidden cursor-pointer" type="button">
-            All categories <ChevronDown className="h-3 w-3 text-gray-500" />
-          </button>
-          <button className="flex h-full w-10 flex-none items-center justify-center bg-[#195f3d] text-white transition-colors hover:bg-emerald-800 cursor-pointer" type="submit" aria-label="Search">
+          <div className="categories-dropdown-container relative h-full flex items-center max-lg:hidden">
+            <button 
+              className="flex h-full items-center gap-1.5 border-0 border-l border-gray-200 bg-transparent px-3 text-xs text-gray-600 hover:text-gray-900 whitespace-nowrap cursor-pointer" 
+              type="button"
+              onClick={() => setCategoriesDropdownOpen(!categoriesDropdownOpen)}
+            >
+              All categories <ChevronDown className="h-3 w-3 text-gray-500" />
+            </button>
+            {categoriesDropdownOpen && (
+              <div className="absolute right-0 top-full z-50 mt-1 w-[450px] bg-white border border-gray-200 shadow-2xl rounded-md flex overflow-hidden">
+                {/* Left Sidebar */}
+                <div className="w-[160px] bg-gray-50 border-r border-gray-100 flex flex-col">
+                  {hierarchy.map((parent, idx) => (
+                    <button
+                      key={parent.title}
+                      type="button"
+                      className={`w-full text-left px-4 py-3 text-xs transition-colors border-l-4 cursor-pointer ${
+                        idx === activeParentIdx 
+                          ? 'bg-white text-[#195f3d] font-bold border-l-[#195f3d]' 
+                          : 'border-l-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                      }`}
+                      onClick={() => setActiveParentIdx(idx)}
+                    >
+                      {parent.title}
+                    </button>
+                  ))}
+                </div>
+                {/* Right Content */}
+                <div className="flex-1 p-5 min-h-[220px]">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                      {hierarchy[activeParentIdx]?.title}
+                    </span>
+                    {hierarchy[activeParentIdx]?.handle && (
+                      <Link 
+                        href={`/collections/${hierarchy[activeParentIdx].handle}`}
+                        className="text-[11px] font-semibold text-[#195f3d] hover:underline"
+                        onClick={() => setCategoriesDropdownOpen(false)}
+                      >
+                        View all
+                      </Link>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                    {hierarchy[activeParentIdx]?.subcategories.map((sub) => (
+                      <Link
+                        key={sub.handle}
+                        href={`/collections/${sub.handle}`}
+                        className="text-xs text-gray-600 hover:text-[#195f3d] hover:font-semibold transition-colors"
+                        onClick={() => setCategoriesDropdownOpen(false)}
+                      >
+                        {sub.title}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          <button className="flex h-full w-10 flex-none items-center justify-center bg-[#195f3d] text-white transition-colors hover:bg-emerald-800 cursor-pointer rounded-r" type="submit" aria-label="Search">
             <Search className="h-4 w-4" />
           </button>
         </form>
