@@ -191,7 +191,7 @@ export async function createCustomerAddress(_previousState: ActionResult, formDa
     zip: String(formData.get('zip') || '').trim(),
     phone: String(formData.get('phone') || '').trim(),
   };
-  if (!address.firstName || !address.lastName || !address.address1 || !address.city || !address.country || !address.zip) return { error: 'Complete the required address fields.' };
+  if (!address.firstName || !address.lastName || !address.address1 || !address.city || !address.province || !address.country || !address.zip) return { error: 'Complete the required address fields, including country and province/state.' };
 
   const result = await customerMutation<AddressMutationData>(customerAddressCreateMutation, { address });
   if (result.error) return { error: result.error };
