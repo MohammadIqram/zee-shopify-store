@@ -35,6 +35,17 @@ interface CollectionBrowserProps {
   filters: CollectionFilter[];
 }
 
+function rememberRecentlyViewed(product: CollectionProduct) {
+  const key = 'urbanplant-recently-viewed';
+  try {
+    const saved = JSON.parse(localStorage.getItem(key) || '[]') as { id: string; title: string; handle: string }[];
+    const next = [{ id: product.id, title: product.title, handle: product.handle }, ...saved.filter((item) => item.id !== product.id)].slice(0, 12);
+    localStorage.setItem(key, JSON.stringify(next));
+  } catch {
+    localStorage.removeItem(key);
+  }
+}
+
 const formatPrice = (amount: string, currencyCode: string) =>
   new Intl.NumberFormat('en-IN', { style: 'currency', currency: currencyCode, maximumFractionDigits: 2 }).format(Number(amount));
 
@@ -149,13 +160,13 @@ function ProductCard({ product, onQuickView }: { product: CollectionProduct; onQ
   return (
     <article className="relative flex min-w-0 flex-col border-r border-[#ddd] p-[20px] max-md:border-b max-md:border-r-0 [&:nth-child(3n)]:border-r-0 max-md:[&:nth-child(3n)]:border-r-0">
       {hasDiscount && <span className="absolute left-0 top-[20px] z-[1] bg-[#195f3d] px-[11px] py-[5px] text-[12px] font-bold text-white">Save {discount}%</span>}
-      <a className="group block" href={`/products/${product.handle}`}>
+      <a className="group block" href={`/products/${product.handle}`} onClick={() => rememberRecentlyViewed(product)}>
         <div className="relative h-[330px] overflow-hidden rounded-br-[15px] rounded-tr-[15px] bg-[#eef2f1] max-md:h-[min(330px,78vw)]">
           {image ? <Image className="object-cover transition-transform duration-250 ease-in-out group-hover:scale-[1.03]" src={image.url} alt={image.altText || product.title} fill sizes="(max-width: 760px) 90vw, 30vw" /> : <span />}
         </div>
       </a>
       <h2 className="mb-[11px] mt-[21px] text-[14px] leading-[1.4] font-normal">
-        <a className="text-[#333] no-underline" href={`/products/${product.handle}`}>{product.title}</a>
+        <a className="text-[#333] no-underline" href={`/products/${product.handle}`} onClick={() => rememberRecentlyViewed(product)}>{product.title}</a>
       </h2>
       <div className="flex items-baseline gap-[16px]">
         <span className="text-[20px] text-[#195f3d]">{formatPrice(price.amount, price.currencyCode)}</span>
