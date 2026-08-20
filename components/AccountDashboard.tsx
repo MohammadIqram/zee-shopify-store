@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Eye, History, MapPin, Pencil, Power, ShoppingCart, UserRound } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { Eye, History, IndianRupee, MapPin, Pencil, Power, ShoppingCart, UserRound } from 'lucide-react';
 import { logoutCustomer } from '@/lib/customer-actions';
 import type { CustomerProfile } from '@/lib/customer-session';
 
@@ -47,12 +47,36 @@ export default function AccountDashboard({ profile }: { profile: CustomerProfile
 }
 
 function ProfilePanel({ profile }: { profile: CustomerProfile | null }) {
-  return <div><div className="flex items-center justify-between"><h2 className="m-0 text-[46px] font-normal leading-tight text-black max-md:text-3xl">My profile</h2><Pencil className="h-9 w-9 text-black" strokeWidth={1.5} /></div><div className="mt-12 divide-y divide-[#999]">
-    <ProfileRow label="First name" value={profile?.firstName || '-'} /><ProfileRow label="Last name" value={profile?.lastName || '-'} /><ProfileRow label="Email" value={profile?.email || '-'} /><ProfileRow label="Email subscription" value="Unsubscribed" />
-  </div></div>;
+  const [editing, setEditing] = useState(false);
+
+  if (editing) return <EditProfilePanel profile={profile} onCancel={() => setEditing(false)} onSubmit={() => setEditing(false)} />;
+
+  return <div>
+    <div className="grid grid-cols-3 gap-10 max-lg:gap-5 max-md:grid-cols-1">
+      <SummaryCard icon={<IndianRupee className="h-6 w-6" strokeWidth={1.5} />} label="Total spent" value="₹0.00" />
+      <SummaryCard icon={<ShoppingCart className="h-6 w-6" strokeWidth={1.5} />} label="All orders" value="0" />
+      <SummaryCard icon={<MapPin className="h-6 w-6" strokeWidth={1.5} />} label="Addresses" value="0" />
+    </div>
+    <div className="mt-24 flex items-center justify-between max-md:mt-12"><h2 className="m-0 text-[46px] font-normal leading-tight text-black max-md:text-3xl">My profile</h2><button type="button" onClick={() => setEditing(true)} className="border-0 bg-transparent p-2 text-black hover:bg-gray-100" aria-label="Edit profile"><Pencil className="h-9 w-9" strokeWidth={1.5} /></button></div>
+    <div className="mt-12 divide-y divide-[#999]">
+      <ProfileRow label="First name" value={profile?.firstName || '-'} /><ProfileRow label="Last name" value={profile?.lastName || '-'} /><ProfileRow label="Email" value={profile?.email || '-'} /><ProfileRow label="Email subscription" value="Unsubscribed" />
+    </div>
+  </div>;
 }
 
+function SummaryCard({ icon, label, value }: { icon: ReactNode; label: string; value: string }) { return <div className="flex min-h-[120px] items-center gap-6 border border-[#a8a8a8] px-7 shadow-sm [border-top-left-radius:14px] [border-bottom-right-radius:14px] max-md:min-h-[100px]"><span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#555]">{icon}</span><div><p className="m-0 text-sm">{label}</p><strong className="mt-2 block text-lg">{value}</strong></div></div>; }
+
 function ProfileRow({ label, value }: { label: string; value: string }) { return <div className="grid grid-cols-[220px_1fr] gap-8 py-5 text-base max-md:grid-cols-[120px_1fr] max-md:gap-4"><strong>{label}</strong><span className="text-gray-500">{value}</span></div>; }
+
+function EditProfilePanel({ profile, onCancel, onSubmit }: { profile: CustomerProfile | null; onCancel: () => void; onSubmit: () => void }) {
+  return <div><h2 className="m-0 text-[46px] font-normal leading-tight text-black max-md:text-3xl">Edit profile</h2><form className="mt-14 max-w-[850px] space-y-6" onSubmit={(event) => { event.preventDefault(); onSubmit(); }}>
+    <label className="block text-base">First name<input className="mt-3 h-14 w-full border border-[#d1d1d1] bg-gray-50 px-4 text-gray-600 outline-none focus:border-black" name="firstName" defaultValue={profile?.firstName || ''} /></label>
+    <label className="block text-base">Last name<input className="mt-3 h-14 w-full border border-[#d1d1d1] bg-gray-50 px-4 text-gray-600 outline-none focus:border-black" name="lastName" defaultValue={profile?.lastName || ''} /></label>
+    <label className="block text-base">Email<input className="mt-3 h-14 w-full border border-[#d1d1d1] bg-gray-50 px-4 text-gray-600 outline-none focus:border-black" name="email" type="email" defaultValue={profile?.email || ''} /></label>
+    <label className="flex items-center gap-3 text-base"><input className="h-4 w-4 accent-black" name="emailSubscription" type="checkbox" />Subscribe to email marketing</label>
+    <div className="flex gap-2"><button type="submit" className="bg-black px-8 py-4 text-sm font-semibold text-white">Submit</button><button type="button" onClick={onCancel} className="border border-black bg-white px-8 py-4 text-sm font-semibold text-black">Cancel</button></div>
+  </form></div>;
+}
 
 function EmptyPanel({ title, message, detail }: { title: string; message: string; detail?: string }) { return <div><h2 className="m-0 text-[46px] font-normal leading-tight text-black max-md:text-3xl">{title}</h2><div className="flex min-h-[300px] flex-col items-center justify-center text-center"><h3 className="m-0 text-lg font-bold">{message}</h3>{detail && <p className="mt-5 text-base text-gray-500">{detail}</p>}</div></div>; }
 
