@@ -5,6 +5,8 @@ import { shopifyFetch } from '@/lib/shopify';
 import { getCustomerName } from '@/lib/customer-session';
 
 interface NavigationData {
+  categoriesMenu?: { id: string; title: string; items: any[] } | null;
+  mainMenu?: { id: string; title: string; items: any[] } | null;
   collections: { edges: { node: { id: string; title: string; handle: string } }[] };
 }
 
@@ -14,10 +16,11 @@ export default async function CartRoute() {
     getCustomerName(),
   ]);
   const categories = data?.collections?.edges.map(({ node }) => node) || [];
+  const menuItems = data?.categoriesMenu?.items || data?.mainMenu?.items || [];
 
   return (
     <div className="min-h-screen bg-[#fafafa] text-gray-900">
-      <Navbar categories={categories} customerName={customerName} />
+      <Navbar categories={categories} menuItems={menuItems} customerName={customerName} />
       <CartPage />
     </div>
   );

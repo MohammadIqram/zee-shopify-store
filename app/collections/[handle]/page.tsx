@@ -18,6 +18,8 @@ interface CollectionData {
 }
 
 interface NavigationData {
+  categoriesMenu?: { id: string; title: string; items: any[] } | null;
+  mainMenu?: { id: string; title: string; items: any[] } | null;
   collections: { edges: { node: { id: string; title: string; handle: string; image?: { url: string; altText?: string | null } | null } }[] };
 }
 
@@ -64,10 +66,11 @@ export default async function CollectionPage({ params }: { params: Promise<{ han
   }
 
   const categories = navigationRes?.data?.collections?.edges.map(({ node }) => node) || [];
+  const menuItems = navigationRes?.data?.categoriesMenu?.items || navigationRes?.data?.mainMenu?.items || [];
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
-      <Navbar categories={categories} customerName={customerName} />
+      <Navbar categories={categories} menuItems={menuItems} customerName={customerName} />
       <CategoryList categories={categories} />
 
       <main className="mx-auto max-w-7xl px-6 py-8 max-md:px-4 max-md:py-5">

@@ -58,7 +58,43 @@ export const getNewArrivalProductsQuery = `
 
 export const getNavigationQuery = `
   query GetNavigation {
-    collections(first: 50, sortKey: TITLE) {
+    categoriesMenu: menu(handle: "categories") {
+      id
+      title
+      items {
+        id
+        title
+        url
+        resourceId
+        type
+        items {
+          id
+          title
+          url
+          resourceId
+          type
+        }
+      }
+    }
+    mainMenu: menu(handle: "main-menu") {
+      id
+      title
+      items {
+        id
+        title
+        url
+        resourceId
+        type
+        items {
+          id
+          title
+          url
+          resourceId
+          type
+        }
+      }
+    }
+    collections(first: 100, sortKey: TITLE) {
       edges {
         node {
           id

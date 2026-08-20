@@ -15,6 +15,8 @@ import { shopifyFetch } from '@/lib/shopify';
 import { getCustomerName } from '@/lib/customer-session';
 
 interface NavigationData {
+  categoriesMenu?: { id: string; title: string; items: any[] } | null;
+  mainMenu?: { id: string; title: string; items: any[] } | null;
   collections: { edges: { node: { id: string; title: string; handle: string; image?: { url: string; altText?: string | null } | null } }[] };
 }
 
@@ -37,6 +39,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   }
 
   const categories = navigationRes?.data?.collections?.edges.map(({ node }) => node) || [];
+  const menuItems = navigationRes?.data?.categoriesMenu?.items || navigationRes?.data?.mainMenu?.items || [];
 
   // Fetch recommendations or fallback to general products
   let recommendations: RecommendationProduct[] = [];
@@ -64,7 +67,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
-      <Navbar categories={categories} customerName={customerName} />
+      <Navbar categories={categories} menuItems={menuItems} customerName={customerName} />
 
       <main className="pb-16">
         <ProductDetailClient product={product} recommendations={recommendations} />

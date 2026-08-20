@@ -9,6 +9,8 @@ import BestSellerProducts from '@/components/BestSellerProducts';
 import NewArrivalProducts from '@/components/NewArrivalProducts';
 
 interface NavigationData {
+  categoriesMenu?: { id: string; title: string; items: any[] } | null;
+  mainMenu?: { id: string; title: string; items: any[] } | null;
   collections: { edges: { node: { id: string; title: string; handle: string; image?: { url: string; altText?: string | null } | null } }[] };
 }
 
@@ -21,10 +23,11 @@ export default async function HomePage() {
   const customerName = await getCustomerName();
 
   const categories = navigation?.collections?.edges.map(({ node }) => node) || [];
+  const menuItems = navigation?.categoriesMenu?.items || navigation?.mainMenu?.items || [];
 
   return (
     <>
-      <Navbar categories={categories} customerName={customerName} />
+      <Navbar categories={categories} menuItems={menuItems} customerName={customerName} />
       <CategoryList categories={categories} />
       <Hero />
       <ShopByCategory categories={categories} />

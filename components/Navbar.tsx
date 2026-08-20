@@ -12,10 +12,36 @@ export interface NavigationItem {
   items: NavigationItem[];
 }
 
+export interface ShopifyMenuItem {
+  id: string;
+  title: string;
+  url: string;
+  resourceId?: string | null;
+  items?: ShopifyMenuItem[];
+}
+
 export interface CollectionCategory {
   id: string;
   title: string;
   handle: string;
+  image?: { url: string; altText?: string | null } | null;
+}
+
+export interface NavbarProps {
+  categories: CollectionCategory[];
+  menuItems?: ShopifyMenuItem[];
+  customerName?: string | null;
+}
+
+function getHandleFromUrl(url?: string | null, title?: string): string {
+  if (url && url.includes('/collections/')) {
+    const parts = url.split('/collections/');
+    if (parts[1]) {
+      const handlePart = parts[1].split('?')[0].split('#')[0].replace(/\/$/, '');
+      if (handlePart) return handlePart;
+    }
+  }
+  return title ? title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : '';
 }
 
 function NavigationItems({ items }: { items: NavigationItem[] }) {
@@ -43,7 +69,7 @@ function NavigationItems({ items }: { items: NavigationItem[] }) {
   );
 }
 
-export default function Navbar({ categories, customerName }: { categories: CollectionCategory[]; customerName?: string | null }) {
+export default function Navbar({ categories, menuItems, customerName }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [cartOpen, setCartOpen] = useState(false);
@@ -144,79 +170,109 @@ export default function Navbar({ categories, customerName }: { categories: Colle
   }, [categoriesDropdownOpen]);
 
   const hierarchy = useMemo(() => {
-    const mapping = [
+    const allShopifySubcategories = (categories || []).map((col) => ({
+      title: col.title,
+      handle: col.handle,
+      url: `/collections/${col.handle}`,
+    }));
+
+    // 1. If menuItems from Shopify Menu exist and have items
+    const collectionMenuItems = (menuItems || []).filter((item) => {
+      const isNotGenericPage = !['home', 'search', 'contact', 'about'].includes(item.title.toLowerCase().trim());
+      return isNotGenericPage;
+    });
+
+    if (collectionMenuItems.length > 0) {
+      const mappedMenuItems = collectionMenuItems.map((item) => {
+        const itemHandle = getHandleFromUrl(item.url, item.title);
+        let subcategories = (item.items || []).map((sub) => ({
+          title: sub.title,
+          handle: getHandleFromUrl(sub.url, sub.title),
+          url: sub.url?.startsWith('/') || sub.url?.startsWith('http') ? sub.url : `/collections/${getHandleFromUrl(sub.url, sub.title)}`,
+        }));
+
+        if (subcategories.length === 0) {
+          const itemKey = item.title.toLowerCase();
+          subcategories = categories
+            .filter((c) => c.title.toLowerCase().includes(itemKey) || c.handle.toLowerCase().includes(itemHandle))
+            .map((c) => ({
+              title: c.title,
+              handle: c.handle,
+              url: `/collections/${c.handle}`,
+            }));
+        }
+
+        return {
+          title: item.title,
+          handle: itemHandle,
+          url: item.url?.startsWith('/') || item.url?.startsWith('http') ? item.url : `/collections/${itemHandle}`,
+          subcategories,
+        };
+      });
+
+      return [
+        {
+          title: 'All Collections',
+          handle: 'all-collections',
+          url: '/collections/all-collections',
+          subcategories: allShopifySubcategories,
+        },
+        ...mappedMenuItems,
+      ];
+    }
+
+    // 2. Dynamic grouping of Shopify collections
+    const groups = [
+      {
+        title: 'All Collections',
+        handle: 'all-collections',
+        subcategories: allShopifySubcategories,
+      },
       {
         title: 'Plants',
-        matches: ['indoor-plants', 'outdoor-plants', 'flowering-plants', 'succulents', 'bonsai', 'ferns', 'creepers', 'medicinal-plants'],
-        defaultSubs: [
-          { title: 'Indoor Plants', handle: 'indoor-plants' },
-          { title: 'Outdoor Plants', handle: 'outdoor-plants' },
-          { title: 'Flowering Plants', handle: 'flowering-plants' },
-          { title: 'Succulents', handle: 'succulents' },
-        ]
+        handle: 'plants',
+        keywords: ['plant', 'succulent', 'indoor', 'outdoor', 'flower', 'bonsai', 'fern', 'creeper', 'medicinal'],
       },
       {
         title: 'Seeds',
-        matches: ['vegetable-seeds', 'flower-seeds', 'herb-seeds', 'fruit-seeds', 'microgreen-seeds'],
-        defaultSubs: [
-          { title: 'Vegetable Seeds', handle: 'vegetable-seeds' },
-          { title: 'Flower Seeds', handle: 'flower-seeds' },
-          { title: 'Herb Seeds', handle: 'herb-seeds' },
-        ]
+        handle: 'seeds',
+        keywords: ['seed', 'vegetable', 'herb', 'fruit', 'microgreen'],
       },
       {
         title: 'Pots & Planters',
-        matches: ['ceramic-pots', 'plastic-pots', 'clay-pots', 'metal-pots', 'hanging-planters', 'grow-bags'],
-        defaultSubs: [
-          { title: 'Ceramic Pots', handle: 'ceramic-pots' },
-          { title: 'Plastic Pots', handle: 'plastic-pots' },
-          { title: 'Grow Bags', handle: 'grow-bags' },
-        ]
+        handle: 'pots-planters',
+        keywords: ['pot', 'planter', 'ceramic', 'plastic', 'clay', 'metal', 'hanging', 'grow-bag'],
       },
       {
         title: 'Gardening Supplies',
-        matches: ['fertilizers', 'soil-manure', 'gardening-tools', 'pesticides', 'watering-cans'],
-        defaultSubs: [
-          { title: 'Fertilizers', handle: 'fertilizers' },
-          { title: 'Gardening Tools', handle: 'gardening-tools' },
-        ]
+        handle: 'gardening-supplies',
+        keywords: ['fertilizer', 'soil', 'manure', 'tool', 'pesticide', 'water', 'care', 'supply', 'supplies'],
       },
     ];
 
-    const groupedHandles = new Set(mapping.flatMap(m => m.matches));
-
-    const result = mapping.map(parent => {
-      let subcategories = categories
-        .filter(col => parent.matches.includes(col.handle))
-        .map(col => ({ title: col.title, handle: col.handle }));
-
-      if (subcategories.length === 0) {
-        subcategories = parent.defaultSubs;
+    const result = groups.map((group) => {
+      if (group.subcategories) {
+        return group;
       }
-
-      const parentCol = categories.find(col => col.handle === parent.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+      const matched = categories.filter((col) => {
+        const h = col.handle.toLowerCase();
+        const t = col.title.toLowerCase();
+        return group.keywords.some((k) => h.includes(k) || t.includes(k));
+      });
 
       return {
-        title: parent.title,
-        handle: parentCol?.handle || parent.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-        subcategories,
+        title: group.title,
+        handle: group.handle,
+        subcategories: matched.map((col) => ({
+          title: col.title,
+          handle: col.handle,
+          url: `/collections/${col.handle}`,
+        })),
       };
     });
 
-    const ungrouped = categories.filter(col => !groupedHandles.has(col.handle));
-    ungrouped.forEach(col => {
-      const isAlreadyParent = result.some(r => r.title.toLowerCase() === col.title.toLowerCase());
-      if (!isAlreadyParent) {
-        result.push({
-          title: col.title,
-          handle: col.handle,
-          subcategories: [],
-        });
-      }
-    });
-
-    return result;
-  }, [categories]);
+    return result.filter((g) => g.subcategories.length > 0);
+  }, [menuItems, categories]);
   const cartTotal = items.reduce((total, item) => total + Number(item.price) * item.quantity, 0);
   const currencyCode = items[0]?.currencyCode || 'INR';
 
@@ -260,7 +316,6 @@ export default function Navbar({ categories, customerName }: { categories: Colle
         </div>
 
         {/* Search Bar */}
-        {/* Search Bar */}
         <form
           className="search-container relative flex h-10 max-w-xl flex-1 items-center rounded border border-gray-300 bg-white max-md:order-3 max-md:w-full max-md:max-w-none"
           role="search"
@@ -287,50 +342,69 @@ export default function Navbar({ categories, customerName }: { categories: Colle
               All categories <ChevronDown className="h-3 w-3 text-gray-500" />
             </button>
             {categoriesDropdownOpen && (
-              <div className="absolute right-0 top-full z-50 mt-1 w-[450px] bg-white border border-gray-200 shadow-2xl rounded-md flex overflow-hidden">
-                {/* Left Sidebar */}
-                <div className="w-[160px] bg-gray-50 border-r border-gray-100 flex flex-col">
+              <div className="absolute right-0 top-full z-50 mt-1 w-[480px] bg-white border border-gray-200 shadow-2xl rounded-md flex overflow-hidden">
+                {/* Left Sidebar - Parent Categories */}
+                <div className="w-[170px] bg-gray-50 border-r border-gray-100 flex flex-col max-h-[360px] overflow-y-auto">
                   {hierarchy.map((parent, idx) => (
                     <button
-                      key={parent.title}
+                      key={`${parent.title}-${idx}`}
                       type="button"
-                      className={`w-full text-left px-4 py-3 text-xs transition-colors border-l-4 cursor-pointer ${idx === activeParentIdx
+                      className={`w-full text-left px-4 py-3 text-xs transition-colors border-l-4 cursor-pointer flex items-center justify-between ${idx === activeParentIdx
                           ? 'bg-white text-[#195f3d] font-bold border-l-[#195f3d]'
                           : 'border-l-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                         }`}
                       onClick={() => setActiveParentIdx(idx)}
                     >
-                      {parent.title}
+                      <span className="truncate">{parent.title}</span>
+                      {parent.subcategories.length > 0 && (
+                        <ChevronRight className="h-3 w-3 flex-none text-gray-400" />
+                      )}
                     </button>
                   ))}
                 </div>
-                {/* Right Content */}
-                <div className="flex-1 p-5 min-h-[220px]">
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
-                      {hierarchy[activeParentIdx]?.title}
-                    </span>
-                    {hierarchy[activeParentIdx]?.handle && (
-                      <Link
-                        href={`/collections/${hierarchy[activeParentIdx].handle}`}
-                        className="text-[11px] font-semibold text-[#195f3d] hover:underline"
-                        onClick={() => setCategoriesDropdownOpen(false)}
-                      >
-                        View all
-                      </Link>
+                {/* Right Content - Sub Categories */}
+                <div className="flex-1 p-5 min-h-[240px] max-h-[360px] overflow-y-auto flex flex-col justify-between">
+                  <div>
+                    <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#195f3d]">
+                        {hierarchy[activeParentIdx]?.title}
+                      </span>
+                      {hierarchy[activeParentIdx]?.handle && (
+                        <Link
+                          href={`/collections/${hierarchy[activeParentIdx].handle}`}
+                          className="text-[11px] font-semibold text-[#195f3d] hover:underline"
+                          onClick={() => setCategoriesDropdownOpen(false)}
+                        >
+                          View all
+                        </Link>
+                      )}
+                    </div>
+                    {hierarchy[activeParentIdx]?.subcategories && hierarchy[activeParentIdx].subcategories.length > 0 ? (
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+                        {hierarchy[activeParentIdx].subcategories.map((sub) => (
+                          <Link
+                            key={sub.handle}
+                            href={`/collections/${sub.handle}`}
+                            className="text-xs text-gray-600 hover:text-[#195f3d] hover:font-semibold transition-colors flex items-center gap-1.5 py-1"
+                            onClick={() => setCategoriesDropdownOpen(false)}
+                          >
+                            <span className="h-1.5 w-1.5 rounded-full bg-[#195f3d] flex-none" />
+                            <span className="truncate">{sub.title}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-gray-500 py-4 text-center">
+                        Browse all items in{' '}
+                        <Link
+                          href={`/collections/${hierarchy[activeParentIdx]?.handle}`}
+                          className="text-[#195f3d] underline font-medium"
+                          onClick={() => setCategoriesDropdownOpen(false)}
+                        >
+                          {hierarchy[activeParentIdx]?.title}
+                        </Link>
+                      </p>
                     )}
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                    {hierarchy[activeParentIdx]?.subcategories.map((sub) => (
-                      <Link
-                        key={sub.handle}
-                        href={`/collections/${sub.handle}`}
-                        className="text-xs text-gray-600 hover:text-[#195f3d] hover:font-semibold transition-colors"
-                        onClick={() => setCategoriesDropdownOpen(false)}
-                      >
-                        {sub.title}
-                      </Link>
-                    ))}
                   </div>
                 </div>
               </div>
