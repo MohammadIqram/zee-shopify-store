@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu, Search, ShoppingBag, ChevronRight, ChevronDown } from 'lucide-react';
 import { useCart } from '@/components/CartProvider';
 
@@ -50,6 +51,85 @@ export default function Navbar({ categories, customerName }: { categories: Colle
 
   const [categoriesDropdownOpen, setCategoriesDropdownOpen] = useState(false);
   const [activeParentIdx, setActiveParentIdx] = useState(0);
+
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
+
+  useEffect(() => {
+    const handleClose = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.search-container')) {
+        setSearchFocused(false);
+      }
+    };
+    document.addEventListener('click', handleClose);
+    return () => document.removeEventListener('click', handleClose);
+  }, []);
+
+  useEffect(() => {
+    if (query.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    const delayDebounce = setTimeout(async () => {
+      setSearchLoading(true);
+      try {
+        const domain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
+        const storefrontAccessToken = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN;
+        const endpoint = `https://${domain}/api/2026-04/graphql.json`;
+
+        const searchQuery = `
+          query SearchProducts($query: String!) {
+            products(first: 6, query: $query) {
+              edges {
+                node {
+                  id
+                  title
+                  handle
+                  images(first: 1) {
+                    edges {
+                      node {
+                        url
+                        altText
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `;
+
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Shopify-Storefront-Access-Token': storefrontAccessToken!,
+          },
+          body: JSON.stringify({
+            query: searchQuery,
+            variables: { query: `title:*${query}*` },
+          }),
+        });
+
+        const body = await response.json();
+        if (body.data?.products?.edges) {
+          setSearchResults(body.data.products.edges.map((edge: any) => edge.node));
+        } else {
+          setSearchResults([]);
+        }
+      } catch (err) {
+        console.error('Error searching products:', err);
+        setSearchResults([]);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(delayDebounce);
+  }, [query]);
 
   useEffect(() => {
     if (!categoriesDropdownOpen) return;
@@ -109,13 +189,13 @@ export default function Navbar({ categories, customerName }: { categories: Colle
       let subcategories = categories
         .filter(col => parent.matches.includes(col.handle))
         .map(col => ({ title: col.title, handle: col.handle }));
-      
+
       if (subcategories.length === 0) {
         subcategories = parent.defaultSubs;
       }
-      
+
       const parentCol = categories.find(col => col.handle === parent.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
-      
+
       return {
         title: parent.title,
         handle: parentCol?.handle || parent.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
@@ -149,7 +229,7 @@ export default function Navbar({ categories, customerName }: { categories: Colle
 
       {/* Main Bar */}
       <div className="mx-auto flex h-18 max-w-7xl items-center justify-between gap-6 px-6 max-lg:gap-4 max-md:h-auto max-md:flex-wrap max-md:p-3">
-        
+
         <div className="flex items-center gap-4">
           {/* Menu Toggle Button */}
           <button
@@ -164,9 +244,9 @@ export default function Navbar({ categories, customerName }: { categories: Colle
           </button>
 
           {/* Brand Logo */}
-          <Link 
-            className="flex items-center gap-2 text-[#852128] no-underline" 
-            href="/" 
+          <Link
+            className="flex items-center gap-2 text-[#852128] no-underline"
+            href="/"
             aria-label="Urban Plant home"
           >
             <span className="relative block h-9 w-5 -rotate-3 rounded-b-xl rounded-t-xl border-2 border-[#852128] before:absolute before:right-[-6px] before:top-[-6px] before:h-2.5 before:w-2.5 before:rounded-full before:border-2 before:border-[#852128] after:absolute after:bottom-1 after:left-1 after:h-3.5 after:w-2 after:-rotate-12 after:rounded-full after:bg-[#195f3d]" aria-hidden="true">
@@ -180,9 +260,10 @@ export default function Navbar({ categories, customerName }: { categories: Colle
         </div>
 
         {/* Search Bar */}
-        <form 
-          className="relative flex h-10 max-w-xl flex-1 items-center rounded border border-gray-300 bg-white max-md:order-3 max-md:w-full max-md:max-w-none" 
-          role="search" 
+        {/* Search Bar */}
+        <form
+          className="search-container relative flex h-10 max-w-xl flex-1 items-center rounded border border-gray-300 bg-white max-md:order-3 max-md:w-full max-md:max-w-none"
+          role="search"
           onSubmit={(event) => event.preventDefault()}
         >
           <input
@@ -190,12 +271,16 @@ export default function Navbar({ categories, customerName }: { categories: Colle
             placeholder="Search products..."
             aria-label="Search products"
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setSearchFocused(true);
+            }}
+            onFocus={() => setSearchFocused(true)}
             className="w-full border-0 bg-transparent px-3 text-xs text-gray-800 outline-none placeholder:text-gray-400 rounded-l"
           />
           <div className="categories-dropdown-container relative h-full flex items-center max-lg:hidden">
-            <button 
-              className="flex h-full items-center gap-1.5 border-0 border-l border-gray-200 bg-transparent px-3 text-xs text-gray-600 hover:text-gray-900 whitespace-nowrap cursor-pointer" 
+            <button
+              className="flex h-full items-center gap-1.5 border-0 border-l border-gray-200 bg-transparent px-3 text-xs text-gray-600 hover:text-gray-900 whitespace-nowrap cursor-pointer"
               type="button"
               onClick={() => setCategoriesDropdownOpen(!categoriesDropdownOpen)}
             >
@@ -209,11 +294,10 @@ export default function Navbar({ categories, customerName }: { categories: Colle
                     <button
                       key={parent.title}
                       type="button"
-                      className={`w-full text-left px-4 py-3 text-xs transition-colors border-l-4 cursor-pointer ${
-                        idx === activeParentIdx 
-                          ? 'bg-white text-[#195f3d] font-bold border-l-[#195f3d]' 
+                      className={`w-full text-left px-4 py-3 text-xs transition-colors border-l-4 cursor-pointer ${idx === activeParentIdx
+                          ? 'bg-white text-[#195f3d] font-bold border-l-[#195f3d]'
                           : 'border-l-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                      }`}
+                        }`}
                       onClick={() => setActiveParentIdx(idx)}
                     >
                       {parent.title}
@@ -227,7 +311,7 @@ export default function Navbar({ categories, customerName }: { categories: Colle
                       {hierarchy[activeParentIdx]?.title}
                     </span>
                     {hierarchy[activeParentIdx]?.handle && (
-                      <Link 
+                      <Link
                         href={`/collections/${hierarchy[activeParentIdx].handle}`}
                         className="text-[11px] font-semibold text-[#195f3d] hover:underline"
                         onClick={() => setCategoriesDropdownOpen(false)}
@@ -255,12 +339,53 @@ export default function Navbar({ categories, customerName }: { categories: Colle
           <button className="flex h-full w-10 flex-none items-center justify-center bg-[#195f3d] text-white transition-colors hover:bg-emerald-800 cursor-pointer rounded-r" type="submit" aria-label="Search">
             <Search className="h-4 w-4" />
           </button>
+
+          {/* Search Results Dropdown */}
+          {searchFocused && query.trim().length >= 2 && (
+            <div className="absolute left-0 right-0 top-full z-[60] mt-1 max-h-[300px] overflow-y-auto rounded-md border border-gray-200 bg-white shadow-2xl py-1">
+              {searchLoading ? (
+                <div className="px-4 py-3 text-xs text-gray-500 text-center">Loading search results...</div>
+              ) : searchResults.length > 0 ? (
+                searchResults.map((product) => {
+                  const image = product.images?.edges?.[0]?.node;
+                  return (
+                    <Link
+                      key={product.id}
+                      href={`/products/${product.handle}`}
+                      className="flex items-center gap-3 px-4 py-2 hover:bg-emerald-50 text-xs text-gray-700 hover:text-[#195f3d] no-underline transition-colors cursor-pointer border-b border-gray-50 last:border-b-0"
+                      onClick={() => {
+                        setSearchFocused(false);
+                        setQuery('');
+                      }}
+                    >
+                      <div className="relative h-8 w-8 flex-none overflow-hidden rounded-full border border-gray-200 bg-white">
+                        {image ? (
+                          <Image
+                            className="object-cover"
+                            src={image.url}
+                            alt={image.altText || product.title}
+                            fill
+                            sizes="32px"
+                          />
+                        ) : (
+                          <div className="h-full w-full bg-gray-100 flex items-center justify-center text-[10px] text-gray-400">?</div>
+                        )}
+                      </div>
+                      <span className="font-medium truncate">{product.title}</span>
+                    </Link>
+                  );
+                })
+              ) : (
+                <div className="px-4 py-3 text-xs text-gray-500 text-center">No products found.</div>
+              )}
+            </div>
+          )}
         </form>
 
         <div className="flex items-center gap-5">
           {/* Account Link */}
-          <a 
-            className="flex flex-col border-r border-gray-300 pr-5 text-right no-underline max-md:border-0 max-md:p-0" 
+          <a
+            className="flex flex-col border-r border-gray-300 pr-5 text-right no-underline max-md:border-0 max-md:p-0"
             href="/account"
           >
             <span className="text-[10px] text-gray-500">{customerName || 'Login / Signup'}</span>
@@ -277,13 +402,13 @@ export default function Navbar({ categories, customerName }: { categories: Colle
               aria-label={`Cart, ${itemCount} item${itemCount === 1 ? '' : 's'}`}
               onClick={() => setCartOpen((open) => !open)}
             >
-            <div className="relative">
-              <ShoppingBag className="h-5 w-5 text-[#195f3d]" />
-              <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#050505] text-[10px] font-medium text-white">
-                {itemCount}
-              </span>
-            </div>
-            <span className="max-md:hidden">Cart</span>
+              <div className="relative">
+                <ShoppingBag className="h-5 w-5 text-[#195f3d]" />
+                <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#050505] text-[10px] font-medium text-white">
+                  {itemCount}
+                </span>
+              </div>
+              <span className="max-md:hidden">Cart</span>
             </button>
             {cartOpen && (
               <div id="cart-popover" className="absolute right-0 top-full z-30 mt-3 w-[min(360px,calc(100vw-32px))] border border-gray-200 bg-white p-4 text-left shadow-xl">
@@ -333,11 +458,10 @@ export default function Navbar({ categories, customerName }: { categories: Colle
       <nav
         id="main-menu"
         aria-hidden={!menuOpen}
-        className={`absolute left-6 top-full z-20 min-w-[220px] rounded-b border border-t-0 border-gray-200 bg-white shadow-lg transition-all duration-200 ease-in-out ${
-          menuOpen
+        className={`absolute left-6 top-full z-20 min-w-[220px] rounded-b border border-t-0 border-gray-200 bg-white shadow-lg transition-all duration-200 ease-in-out ${menuOpen
             ? 'visible pointer-events-auto opacity-100 translate-y-0 max-md:max-h-[60vh] max-md:overflow-y-auto'
             : 'invisible pointer-events-none opacity-0 -translate-y-2 max-md:max-h-0'
-        } max-md:left-0 max-md:right-0 max-md:w-full`}
+          } max-md:left-0 max-md:right-0 max-md:w-full`}
       >
         {categories.length > 0 ? (
           <NavigationItems
