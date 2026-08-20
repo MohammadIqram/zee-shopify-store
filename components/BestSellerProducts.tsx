@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useCart } from '@/components/CartProvider';
 
 interface BestSellerProduct {
@@ -32,7 +33,7 @@ export default function BestSellerProducts({ products }: { products: BestSellerP
     <div className="mx-auto max-w-7xl">
       <div className="mb-7 flex items-center justify-between gap-4">
         <h2 id="bestsellers-title" className="m-0 text-[24px] font-bold text-[#263b4d]">Bestsellers of the Week</h2>
-        <a className="text-sm font-semibold text-[#195f3d] no-underline hover:underline" href="/">View all</a>
+        <Link className="text-sm font-semibold text-[#195f3d] no-underline hover:underline" href="/collections/best-selling-products">View all</Link>
       </div>
       <div className="grid grid-cols-4 border border-[#d5dadd] max-lg:grid-cols-2 max-md:grid-cols-1">
         {products.map((product) => <BestSellerCard key={product.id} product={product} />)}

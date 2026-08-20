@@ -4,7 +4,7 @@ import { ChevronRight } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import CategoryList from '@/components/CategoryList';
 import CollectionBrowser, { type CollectionFilter, type CollectionProduct } from '@/components/CollectionBrowser';
-import { getCollectionQuery, getNavigationQuery } from '@/lib/queries';
+import { getCollectionQuery, getNavigationQuery, getBestSellingProductsPageQuery, getNewArrivalsProductsPageQuery } from '@/lib/queries';
 import { shopifyFetch } from '@/lib/shopify';
 import { getCustomerName } from '@/lib/customer-session';
 
@@ -23,16 +23,47 @@ interface NavigationData {
 
 export default async function CollectionPage({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params;
-  const [{ data: collectionData }, { data: navigation }, customerName] = await Promise.all([
-    shopifyFetch<CollectionData>({ query: getCollectionQuery, variables: { handle } }),
+  const isBestSelling = handle === 'best-selling-products';
+  const isNewArrivals = handle === 'new-arrivals';
+
+  const [collectionRes, navigationRes, customerName] = await Promise.all([
+    isBestSelling
+      ? shopifyFetch<{ products: { edges: { node: CollectionProduct }[] } }>({
+          query: getBestSellingProductsPageQuery,
+        })
+      : isNewArrivals
+      ? shopifyFetch<{ products: { edges: { node: CollectionProduct }[] } }>({
+          query: getNewArrivalsProductsPageQuery,
+        })
+      : shopifyFetch<CollectionData>({
+          query: getCollectionQuery,
+          variables: { handle },
+        }),
     shopifyFetch<NavigationData>({ query: getNavigationQuery }),
     getCustomerName(),
   ]);
 
-  if (!collectionData?.collection) notFound();
+  let collection;
+  if (isBestSelling || isNewArrivals) {
+    const customData = collectionRes.data as { products?: { edges: { node: CollectionProduct }[] } };
+    collection = {
+      id: handle,
+      title: isBestSelling ? 'Best Selling Products' : 'New Arrivals',
+      description: isBestSelling
+        ? 'Browse our most popular and best-selling products.'
+        : 'Check out our latest arrivals and new products.',
+      products: {
+        edges: customData?.products?.edges || [],
+        filters: [] as CollectionFilter[],
+      },
+    };
+  } else {
+    const collectionData = collectionRes.data as CollectionData;
+    if (!collectionData?.collection) notFound();
+    collection = collectionData.collection;
+  }
 
-  const collection = collectionData.collection;
-  const categories = navigation?.collections?.edges.map(({ node }) => node) || [];
+  const categories = navigationRes?.data?.collections?.edges.map(({ node }) => node) || [];
 
   return (
     <div className="min-h-screen bg-white text-gray-900">

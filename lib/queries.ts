@@ -158,3 +158,62 @@ export const getBestSellerProductsQuery = `
     }
   }
 `;
+
+export const getBestSellingProductsPageQuery = `
+  query GetBestSellingProductsPage {
+    products(first: 50, sortKey: BEST_SELLING) {
+      edges {
+        node {
+          id
+          title
+          handle
+          priceRange { minVariantPrice { amount currencyCode } }
+          compareAtPriceRange { minVariantPrice { amount currencyCode } }
+          variants(first: 100) {
+            edges {
+              node {
+                id
+                title
+                availableForSale
+                price { amount currencyCode }
+                compareAtPrice { amount currencyCode }
+                selectedOptions { name value }
+              }
+            }
+          }
+          images(first: 6) { edges { node { url altText } } }
+        }
+      }
+    }
+  }
+`;
+
+export const getNewArrivalsProductsPageQuery = `
+  query GetNewArrivalsProductsPage {
+    products(first: 50, sortKey: CREATED_AT, reverse: true) {
+      edges {
+        node {
+          id
+          title
+          handle
+          priceRange { minVariantPrice { amount currencyCode } }
+          compareAtPriceRange { minVariantPrice { amount currencyCode } }
+          variants(first: 100) {
+            edges {
+              node {
+                id
+                title
+                availableForSale
+                price { amount currencyCode }
+                compareAtPrice { amount currencyCode }
+                selectedOptions { name value }
+              }
+            }
+          }
+          images(first: 6) { edges { node { url altText } } }
+        }
+      }
+    }
+  }
+`;
+
