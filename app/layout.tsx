@@ -31,9 +31,11 @@ export const metadata: Metadata = {
     description: "Buy healthy indoor & outdoor live plants, pots, planters, organic seeds & fertilizers online. Fast shipping across India with 30-Day Plant Guarantee.",
     images: [
       {
-        url: "/images/hero_img_1.png",
+        url: "https://garden-by-zee.vercel.app/images/hero_img_1.png",
+        secureUrl: "https://garden-by-zee.vercel.app/images/hero_img_1.png",
         width: 1200,
         height: 630,
+        type: "image/png",
         alt: "Garden by Zee - Live Plants & Garden Essentials",
       },
     ],
@@ -44,13 +46,17 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Garden by Zee | Premium Live Plants & Gardening Supplies",
     description: "Buy healthy indoor & outdoor live plants, pots, planters, organic seeds & fertilizers online. Fast shipping across India.",
-    images: ["/images/hero_img_1.png"],
+    images: ["https://garden-by-zee.vercel.app/images/hero_img_1.png"],
     creator: "@gardenbyzee",
   },
 
-  // WhatsApp & Browser Theme
+  // WhatsApp & Scrapers Meta Tags
   other: {
-    "og:image:secure_url": "/images/hero_img_1.png",
+    "og:image": "https://garden-by-zee.vercel.app/images/hero_img_1.png",
+    "og:image:secure_url": "https://garden-by-zee.vercel.app/images/hero_img_1.png",
+    "og:image:type": "image/png",
+    "og:image:width": "1200",
+    "og:image:height": "630",
     "theme-color": "#183D2B",
   },
 };

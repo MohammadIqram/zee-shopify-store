@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import CategoryList from '@/components/CategoryList';
@@ -18,6 +19,39 @@ interface NavigationData {
   categoriesMenu?: { id: string; title: string; items: any[] } | null;
   mainMenu?: { id: string; title: string; items: any[] } | null;
   collections: { edges: { node: { id: string; title: string; handle: string; image?: { url: string; altText?: string | null } | null } }[] };
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ handle: string }> }): Promise<Metadata> {
+  const { handle } = await params;
+  const res = await shopifyFetch<{ product: ProductDetailData | null }>({
+    query: getProductQuery,
+    variables: { handle },
+  });
+  const product = res.data?.product;
+  if (!product) return {};
+
+  const image = product.images.edges[0]?.node?.url || 'https://garden-by-zee.vercel.app/images/hero_img_1.png';
+  const title = `${product.title} | Garden by Zee`;
+  const description = product.description ? product.description.slice(0, 160) : `Buy ${product.title} online at Garden by Zee. Fast delivery across India.`;
+
+  return {
+    title: product.title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `https://garden-by-zee.vercel.app/products/${handle}`,
+      siteName: 'Garden by Zee',
+      images: [{ url: image, alt: product.title }],
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [image],
+    },
+  };
 }
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ handle: string }> }) {

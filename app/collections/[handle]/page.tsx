@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
@@ -21,6 +22,37 @@ interface NavigationData {
   categoriesMenu?: { id: string; title: string; items: any[] } | null;
   mainMenu?: { id: string; title: string; items: any[] } | null;
   collections: { edges: { node: { id: string; title: string; handle: string; image?: { url: string; altText?: string | null } | null } }[] };
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ handle: string }> }): Promise<Metadata> {
+  const { handle } = await params;
+  let title = `${handle.replace(/-/g, ' ')} Collection`;
+
+  if (handle === 'best-selling-products') title = 'Best Selling Products';
+  if (handle === 'new-arrivals') title = 'New Arrivals';
+
+  const fullTitle = `${title} | Garden by Zee`;
+  const description = `Shop ${title} online at Garden by Zee. Discover healthy live plants, planters, and garden supplies with fast shipping across India.`;
+  const image = 'https://garden-by-zee.vercel.app/images/hero_img_1.png';
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title: fullTitle,
+      description,
+      url: `https://garden-by-zee.vercel.app/collections/${handle}`,
+      siteName: 'Garden by Zee',
+      images: [{ url: image, alt: title }],
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: fullTitle,
+      description,
+      images: [image],
+    },
+  };
 }
 
 export default async function CollectionPage({ params }: { params: Promise<{ handle: string }> }) {
