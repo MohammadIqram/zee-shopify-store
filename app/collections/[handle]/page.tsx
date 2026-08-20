@@ -28,11 +28,11 @@ export default async function CollectionPage({ params }: { params: Promise<{ han
 
   const [collectionRes, navigationRes, customerName] = await Promise.all([
     isBestSelling
-      ? shopifyFetch<{ products: { edges: { node: CollectionProduct }[] } }>({
+      ? shopifyFetch<{ products: { edges: { node: CollectionProduct }[]; filters: CollectionFilter[] } }>({
           query: getBestSellingProductsPageQuery,
         })
       : isNewArrivals
-      ? shopifyFetch<{ products: { edges: { node: CollectionProduct }[] } }>({
+      ? shopifyFetch<{ products: { edges: { node: CollectionProduct }[]; filters: CollectionFilter[] } }>({
           query: getNewArrivalsProductsPageQuery,
         })
       : shopifyFetch<CollectionData>({
@@ -45,7 +45,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ han
 
   let collection;
   if (isBestSelling || isNewArrivals) {
-    const customData = collectionRes.data as { products?: { edges: { node: CollectionProduct }[] } };
+    const customData = collectionRes.data as { products?: { edges: { node: CollectionProduct }[]; filters: CollectionFilter[] } };
     collection = {
       id: handle,
       title: isBestSelling ? 'Best Selling Products' : 'New Arrivals',
@@ -54,7 +54,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ han
         : 'Check out our latest arrivals and new products.',
       products: {
         edges: customData?.products?.edges || [],
-        filters: [] as CollectionFilter[],
+        filters: customData?.products?.filters || [],
       },
     };
   } else {

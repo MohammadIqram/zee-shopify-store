@@ -184,6 +184,12 @@ export const getBestSellingProductsPageQuery = `
           images(first: 6) { edges { node { url altText } } }
         }
       }
+      filters {
+        id
+        label
+        type
+        values { id label count input }
+      }
     }
   }
 `;
@@ -213,7 +219,65 @@ export const getNewArrivalsProductsPageQuery = `
           images(first: 6) { edges { node { url altText } } }
         }
       }
+      filters {
+        id
+        label
+        type
+        values { id label count input }
+      }
     }
   }
 `;
+
+export const getProductQuery = `
+  query GetProduct($handle: String!) {
+    product(handle: $handle) {
+      id
+      title
+      handle
+      description
+      descriptionHtml
+      priceRange { minVariantPrice { amount currencyCode } }
+      compareAtPriceRange { minVariantPrice { amount currencyCode } }
+      variants(first: 100) {
+        edges {
+          node {
+            id
+            title
+            availableForSale
+            price { amount currencyCode }
+            compareAtPrice { amount currencyCode }
+            selectedOptions { name value }
+          }
+        }
+      }
+      images(first: 10) { edges { node { url altText } } }
+    }
+  }
+`;
+
+export const getProductRecommendationsQuery = `
+  query GetProductRecommendations($productId: ID!) {
+    productRecommendations(productId: $productId) {
+      id
+      title
+      handle
+      priceRange { minVariantPrice { amount currencyCode } }
+      compareAtPriceRange { minVariantPrice { amount currencyCode } }
+      variants(first: 10) {
+        edges {
+          node {
+            id
+            title
+            availableForSale
+            price { amount currencyCode }
+            compareAtPrice { amount currencyCode }
+          }
+        }
+      }
+      images(first: 1) { edges { node { url altText } } }
+    }
+  }
+`;
+
 
