@@ -51,11 +51,11 @@ function NavigationItems({ items }: { items: NavigationItem[] }) {
         <li key={`${item.title}-${item.url}`} className="group/item relative max-md:border-b max-md:border-gray-100">
           <a
             href={item.url}
-            className="flex items-center justify-between gap-4 px-4 py-2.5 text-xs font-medium text-gray-700 no-underline whitespace-nowrap transition-colors hover:bg-emerald-50 hover:text-[#195f3d] focus-visible:bg-emerald-50 focus-visible:text-[#195f3d] max-md:px-4 max-md:py-3"
+            className="flex items-center justify-between gap-4 px-4 py-2.5 text-xs font-medium text-[#202722] no-underline whitespace-nowrap transition-colors hover:bg-[#F5F2E9] hover:text-[#183D2B] focus-visible:bg-[#F5F2E9] focus-visible:text-[#183D2B] max-md:px-4 max-md:py-3"
           >
             <span>{item.title}</span>
             {item.items.length > 0 && (
-              <ChevronRight className="h-3.5 w-3.5 text-[#195f3d]" />
+              <ChevronRight className="h-3.5 w-3.5 text-[#183D2B]" />
             )}
           </a>
           {item.items.length > 0 && (
@@ -277,9 +277,9 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
   const currencyCode = items[0]?.currencyCode || 'INR';
 
   return (
-    <header className="relative bg-[#fafafa] text-gray-800 shadow-sm">
+    <header className="relative bg-[#F5F2E9] text-[#202722] shadow-sm">
       {/* Top Banner */}
-      <div className="bg-[#195f3d] px-4 py-3 text-center text-sm font-medium tracking-wide text-white max-md:text-[13px] max-md:py-2.5">
+      <div className="bg-[#183D2B] px-4 py-3 text-center text-sm font-medium tracking-wide text-[#F5F2E9] max-md:text-[13px] max-md:py-2.5">
         Free Shipping Above ₹499 | Fast All India Delivery
       </div>
 
@@ -289,35 +289,35 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
         <div className="flex items-center gap-5">
           {/* Menu Toggle Button */}
           <button
-            className="flex h-12 items-center justify-center gap-2.5 rounded border border-gray-300 bg-white px-4.5 text-sm font-semibold text-[#195f3d] transition-colors hover:bg-gray-50 cursor-pointer"
+            className="flex h-12 items-center justify-center gap-2.5 rounded border border-[#E7DFCF] bg-white px-4.5 text-sm font-semibold text-[#183D2B] transition-colors hover:bg-[#E7DFCF]/40 cursor-pointer"
             type="button"
             aria-expanded={menuOpen}
             aria-controls="main-menu"
             onClick={() => setMenuOpen((open) => !open)}
           >
-            <Menu className="h-5 w-5 text-[#195f3d]" />
+            <Menu className="h-5 w-5 text-[#183D2B]" />
             <span>Menu</span>
           </button>
 
           {/* Brand Logo */}
           <Link
-            className="flex items-center gap-2 text-[#852128] no-underline"
+            className="flex items-center gap-2 text-[#183D2B] no-underline"
             href="/"
             aria-label="Garden by Zee home"
           >
-            <span className="relative block h-10 w-6 -rotate-3 rounded-b-xl rounded-t-xl border-2 border-[#852128] before:absolute before:right-[-6px] before:top-[-6px] before:h-2.5 before:w-2.5 before:rounded-full before:border-2 before:border-[#852128] after:absolute after:bottom-1 after:left-1 after:h-3.5 after:w-2 after:-rotate-12 after:rounded-full after:bg-[#195f3d]" aria-hidden="true">
-              <span className="absolute left-2 top-3 h-2.5 w-1.5 rotate-45 rounded-full bg-[#195f3d]" />
+            <span className="relative block h-10 w-6 -rotate-3 rounded-b-xl rounded-t-xl border-2 border-[#6B4A32] before:absolute before:right-[-6px] before:top-[-6px] before:h-2.5 before:w-2.5 before:rounded-full before:border-2 before:border-[#6B4A32] after:absolute after:bottom-1 after:left-1 after:h-3.5 after:w-2 after:-rotate-12 after:rounded-full after:bg-[#3F6B45]" aria-hidden="true">
+              <span className="absolute left-2 top-3 h-2.5 w-1.5 rotate-45 rounded-full bg-[#3F6B45]" />
             </span>
-            <span className="text-[27px] font-bold tracking-tight text-[#852128] leading-none">
-              garden<span className="text-[#195f3d]">byzee</span>
-              <sup className="ml-0.5 text-[10px] font-normal">®</sup>
+            <span className="text-[27px] font-bold tracking-tight text-[#183D2B] leading-none">
+              garden<span className="text-[#3F6B45]">byzee</span>
+              <sup className="ml-0.5 text-[10px] font-normal text-[#B59A5A]">®</sup>
             </span>
           </Link>
         </div>
 
         {/* Search Bar */}
         <form
-          className="search-container relative flex h-12 max-w-xl flex-1 items-center rounded border border-gray-300 bg-white max-md:order-3 max-md:w-full max-md:max-w-none"
+          className="search-container relative flex h-12 max-w-xl flex-1 items-center rounded border border-[#E7DFCF] bg-white max-md:order-3 max-md:w-full max-md:max-w-none shadow-xs"
           role="search"
           onSubmit={(event) => event.preventDefault()}
         >
@@ -331,48 +331,48 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
               setSearchFocused(true);
             }}
             onFocus={() => setSearchFocused(true)}
-            className="w-full border-0 bg-transparent px-4 text-sm text-gray-800 outline-none placeholder:text-gray-400 rounded-l"
+            className="w-full border-0 bg-transparent px-4 text-sm text-[#202722] outline-none placeholder:text-gray-400 rounded-l"
           />
           <div className="categories-dropdown-container relative h-full flex items-center max-lg:hidden">
             <button
-              className="flex h-full items-center gap-2 border-0 border-l border-gray-200 bg-transparent px-4 text-sm text-gray-600 hover:text-gray-900 whitespace-nowrap cursor-pointer"
+              className="flex h-full items-center gap-2 border-0 border-l border-[#E7DFCF] bg-transparent px-4 text-sm text-[#202722] hover:text-[#183D2B] whitespace-nowrap cursor-pointer"
               type="button"
               onClick={() => setCategoriesDropdownOpen(!categoriesDropdownOpen)}
             >
-              All categories <ChevronDown className="h-4 w-4 text-gray-500" />
+              All categories <ChevronDown className="h-4 w-4 text-[#6B4A32]" />
             </button>
             {categoriesDropdownOpen && (
-              <div className="absolute right-0 top-full z-50 mt-1 w-[520px] bg-white border border-gray-200 shadow-2xl rounded-md flex overflow-hidden">
+              <div className="absolute right-0 top-full z-50 mt-1 w-[520px] bg-white border border-[#E7DFCF] shadow-2xl rounded-md flex overflow-hidden">
                 {/* Left Sidebar - Parent Categories */}
-                <div className="w-[190px] bg-gray-50 border-r border-gray-100 flex flex-col max-h-[400px] overflow-y-auto">
+                <div className="w-[190px] bg-[#F5F2E9] border-r border-[#E7DFCF] flex flex-col max-h-[400px] overflow-y-auto">
                   {hierarchy.map((parent, idx) => (
                     <button
                       key={`${parent.title}-${idx}`}
                       type="button"
                       className={`w-full text-left px-4.5 py-4 text-sm transition-colors border-l-4 cursor-pointer flex items-center justify-between ${idx === activeParentIdx
-                          ? 'bg-white text-[#195f3d] font-bold border-l-[#195f3d]'
-                          : 'border-l-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                          ? 'bg-white text-[#183D2B] font-bold border-l-[#B59A5A]'
+                          : 'border-l-transparent text-[#202722] hover:bg-[#E7DFCF]/50'
                         }`}
                       onClick={() => setActiveParentIdx(idx)}
                     >
                       <span className="truncate">{parent.title}</span>
                       {parent.subcategories.length > 0 && (
-                        <ChevronRight className="h-4 w-4 flex-none text-gray-400" />
+                        <ChevronRight className="h-4 w-4 flex-none text-[#6B4A32]" />
                       )}
                     </button>
                   ))}
                 </div>
                 {/* Right Content - Sub Categories */}
-                <div className="flex-1 p-6 min-h-[260px] max-h-[400px] overflow-y-auto flex flex-col justify-between">
+                <div className="flex-1 p-6 min-h-[260px] max-h-[400px] overflow-y-auto flex flex-col justify-between bg-white">
                   <div>
-                    <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
-                      <span className="text-[13px] font-bold uppercase tracking-wider text-[#195f3d]">
+                    <div className="flex justify-between items-center mb-4 pb-2 border-b border-[#E7DFCF]">
+                      <span className="text-[13px] font-bold uppercase tracking-wider text-[#183D2B]">
                         {hierarchy[activeParentIdx]?.title}
                       </span>
                       {hierarchy[activeParentIdx]?.handle && (
                         <Link
                           href={`/collections/${hierarchy[activeParentIdx].handle}`}
-                          className="text-[13px] font-semibold text-[#195f3d] hover:underline"
+                          className="text-[13px] font-semibold text-[#3F6B45] hover:text-[#183D2B] hover:underline"
                           onClick={() => setCategoriesDropdownOpen(false)}
                         >
                           View all
@@ -385,10 +385,10 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
                           <Link
                             key={sub.handle}
                             href={`/collections/${sub.handle}`}
-                            className="text-sm text-gray-600 hover:text-[#195f3d] hover:font-semibold transition-colors flex items-center gap-2 py-1"
+                            className="text-sm text-[#202722] hover:text-[#183D2B] hover:font-semibold transition-colors flex items-center gap-2 py-1"
                             onClick={() => setCategoriesDropdownOpen(false)}
                           >
-                            <span className="h-1.5 w-1.5 rounded-full bg-[#195f3d] flex-none" />
+                            <span className="h-1.5 w-1.5 rounded-full bg-[#3F6B45] flex-none" />
                             <span className="truncate">{sub.title}</span>
                           </Link>
                         ))}
@@ -398,7 +398,7 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
                         Browse all items in{' '}
                         <Link
                           href={`/collections/${hierarchy[activeParentIdx]?.handle}`}
-                          className="text-[#195f3d] underline font-medium"
+                          className="text-[#183D2B] underline font-medium"
                           onClick={() => setCategoriesDropdownOpen(false)}
                         >
                           {hierarchy[activeParentIdx]?.title}
@@ -410,13 +410,13 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
               </div>
             )}
           </div>
-          <button className="flex h-full w-12 flex-none items-center justify-center bg-[#195f3d] text-white transition-colors hover:bg-emerald-800 cursor-pointer rounded-r" type="submit" aria-label="Search">
+          <button className="flex h-full w-12 flex-none items-center justify-center bg-[#183D2B] text-[#F5F2E9] transition-colors hover:bg-[#3F6B45] cursor-pointer rounded-r" type="submit" aria-label="Search">
             <Search className="h-5 w-5" />
           </button>
 
           {/* Search Results Dropdown */}
           {searchFocused && query.trim().length >= 2 && (
-            <div className="absolute left-0 right-0 top-full z-[60] mt-1 max-h-[340px] overflow-y-auto rounded-md border border-gray-200 bg-white shadow-2xl py-1">
+            <div className="absolute left-0 right-0 top-full z-[60] mt-1 max-h-[340px] overflow-y-auto rounded-md border border-[#E7DFCF] bg-white shadow-2xl py-1">
               {searchLoading ? (
                 <div className="px-4 py-3.5 text-sm text-gray-500 text-center">Loading search results...</div>
               ) : searchResults.length > 0 ? (
@@ -426,13 +426,13 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
                     <Link
                       key={product.id}
                       href={`/products/${product.handle}`}
-                      className="flex items-center gap-3.5 px-4.5 py-3 hover:bg-emerald-50 text-sm text-gray-700 hover:text-[#195f3d] no-underline transition-colors cursor-pointer border-b border-gray-50 last:border-b-0"
+                      className="flex items-center gap-3.5 px-4.5 py-3 hover:bg-[#F5F2E9] text-sm text-[#202722] hover:text-[#183D2B] no-underline transition-colors cursor-pointer border-b border-gray-100 last:border-b-0"
                       onClick={() => {
                         setSearchFocused(false);
                         setQuery('');
                       }}
                     >
-                      <div className="relative h-9 w-9 flex-none overflow-hidden rounded-full border border-gray-200 bg-white">
+                      <div className="relative h-9 w-9 flex-none overflow-hidden rounded-full border border-[#E7DFCF] bg-white">
                         {image ? (
                           <Image
                             className="object-cover"
@@ -459,17 +459,17 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
         <div className="flex items-center gap-6">
           {/* Account Link */}
           <a
-            className="flex flex-col border-r border-gray-300 pr-6 text-right no-underline max-md:border-0 max-md:p-0"
+            className="flex flex-col border-r border-[#E7DFCF] pr-6 text-right no-underline max-md:border-0 max-md:p-0"
             href="/account"
           >
             <span className="text-xs text-gray-500">{customerName || 'Login / Signup'}</span>
-            <span className="text-sm font-semibold text-[#195f3d]">My Account</span>
+            <span className="text-sm font-semibold text-[#183D2B]">My Account</span>
           </a>
 
           {/* Cart Link */}
           <div className="relative">
             <button
-              className="relative flex cursor-pointer items-center gap-2.5 border-0 bg-transparent text-sm font-bold text-[#195f3d] no-underline"
+              className="relative flex cursor-pointer items-center gap-2.5 border-0 bg-transparent text-sm font-bold text-[#183D2B] no-underline"
               type="button"
               aria-expanded={cartOpen}
               aria-controls="cart-popover"
@@ -477,17 +477,17 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
               onClick={() => setCartOpen((open) => !open)}
             >
               <div className="relative">
-                <ShoppingBag className="h-6 w-6 text-[#195f3d]" />
-                <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#050505] text-[11px] font-medium text-white">
+                <ShoppingBag className="h-6 w-6 text-[#183D2B]" />
+                <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#6B4A32] text-[11px] font-bold text-white">
                   {itemCount}
                 </span>
               </div>
               <span className="max-md:hidden">Cart</span>
             </button>
             {cartOpen && (
-              <div id="cart-popover" className="absolute right-0 top-full z-30 mt-3 w-[min(360px,calc(100vw-32px))] border border-gray-200 bg-white p-4 text-left shadow-xl">
+              <div id="cart-popover" className="absolute right-0 top-full z-30 mt-3 w-[min(360px,calc(100vw-32px))] border border-[#E7DFCF] bg-white p-4 text-left shadow-xl rounded-md">
                 <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-                  <h2 className="m-0 text-sm font-bold text-gray-900">Your cart</h2>
+                  <h2 className="m-0 text-sm font-bold text-[#202722]">Your cart</h2>
                   <span className="text-xs text-gray-500">{itemCount} item{itemCount === 1 ? '' : 's'}</span>
                 </div>
                 {items.length === 0 ? (
@@ -499,25 +499,25 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
                         <li className="py-3" key={item.variantId}>
                           <div className="flex items-start justify-between gap-3">
                             <div>
-                              <p className="m-0 text-sm font-semibold text-gray-800">{item.title}</p>
+                              <p className="m-0 text-sm font-semibold text-[#202722]">{item.title}</p>
                               {item.variantTitle !== 'Default Title' && <p className="m-0 mt-1 text-xs text-gray-500">{item.variantTitle}</p>}
-                              <p className="m-0 mt-1 text-xs text-[#195f3d]">{item.price} {item.currencyCode}</p>
+                              <p className="m-0 mt-1 text-xs font-semibold text-[#183D2B]">{item.price} {item.currencyCode}</p>
                             </div>
-                            <button className="cursor-pointer border-0 bg-transparent p-0 text-xs text-gray-500 underline" type="button" onClick={() => removeItem(item.variantId)}>Remove</button>
+                            <button className="cursor-pointer border-0 bg-transparent p-0 text-xs text-gray-500 underline hover:text-[#183D2B]" type="button" onClick={() => removeItem(item.variantId)}>Remove</button>
                           </div>
                           <div className="mt-2 flex items-center gap-3">
-                            <button className="flex h-6 w-6 cursor-pointer items-center justify-center border border-gray-200 bg-white" type="button" aria-label={`Decrease ${item.title} quantity`} onClick={() => updateQuantity(item.variantId, item.quantity - 1)}>−</button>
+                            <button className="flex h-6 w-6 cursor-pointer items-center justify-center border border-[#E7DFCF] bg-white" type="button" aria-label={`Decrease ${item.title} quantity`} onClick={() => updateQuantity(item.variantId, item.quantity - 1)}>−</button>
                             <span className="min-w-4 text-center text-xs">{item.quantity}</span>
-                            <button className="flex h-6 w-6 cursor-pointer items-center justify-center border border-gray-200 bg-white" type="button" aria-label={`Increase ${item.title} quantity`} onClick={() => updateQuantity(item.variantId, item.quantity + 1)}>+</button>
+                            <button className="flex h-6 w-6 cursor-pointer items-center justify-center border border-[#E7DFCF] bg-white" type="button" aria-label={`Increase ${item.title} quantity`} onClick={() => updateQuantity(item.variantId, item.quantity + 1)}>+</button>
                           </div>
                         </li>
                       ))}
                     </ul>
-                    <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-sm font-bold text-gray-900">
+                    <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-sm font-bold text-[#202722]">
                       <span>Total</span>
-                      <span>{new Intl.NumberFormat('en-IN', { style: 'currency', currency: currencyCode }).format(cartTotal)}</span>
+                      <span className="text-[#183D2B]">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: currencyCode }).format(cartTotal)}</span>
                     </div>
-                    <Link className="mt-4 block w-full bg-[#195f3d] px-4 py-3 text-center text-sm font-bold text-[#f5c400] no-underline transition-colors hover:bg-[#124b30]" href="/cart" onClick={() => setCartOpen(false)}>
+                    <Link className="mt-4 block w-full bg-[#183D2B] px-4 py-3 text-center text-sm font-bold text-[#B59A5A] no-underline transition-colors hover:bg-[#3F6B45]" href="/cart" onClick={() => setCartOpen(false)}>
                       Go to cart
                     </Link>
                   </>
@@ -532,7 +532,7 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
       <nav
         id="main-menu"
         aria-hidden={!menuOpen}
-        className={`absolute left-6 top-full z-20 min-w-[220px] rounded-b border border-t-0 border-gray-200 bg-white shadow-lg transition-all duration-200 ease-in-out ${menuOpen
+        className={`absolute left-6 top-full z-20 min-w-[220px] rounded-b border border-t-0 border-[#E7DFCF] bg-white shadow-lg transition-all duration-200 ease-in-out ${menuOpen
             ? 'visible pointer-events-auto opacity-100 translate-y-0 max-md:max-h-[60vh] max-md:overflow-y-auto'
             : 'invisible pointer-events-none opacity-0 -translate-y-2 max-md:max-h-0'
           } max-md:left-0 max-md:right-0 max-md:w-full`}

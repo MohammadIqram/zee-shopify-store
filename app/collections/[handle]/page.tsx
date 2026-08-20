@@ -76,7 +76,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ han
       <main className="mx-auto max-w-7xl px-6 py-8 max-md:px-4 max-md:py-5">
         {/* Breadcrumb Navigation */}
         <nav className="mb-6 flex items-center gap-2 text-xs font-medium text-gray-500" aria-label="Breadcrumb">
-          <Link href="/" className="transition-colors hover:text-[#195f3d]">
+          <Link href="/" className="transition-colors hover:text-[#183D2B]">
             Home
           </Link>
           <ChevronRight className="h-3 w-3 text-gray-400" />

@@ -18,11 +18,11 @@ export default function AccountAuth() {
 
   return (
     <section className="w-full max-w-[520px] border border-[#dedede] bg-white px-8 py-10 max-md:px-5">
-      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#195f3d]">My account</p>
+      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#183D2B]">My account</p>
       <h1 className="m-0 text-[30px] font-bold italic text-[#172b3d]">{mode === 'login' ? 'Log in' : 'Create an account'}</h1>
       <p className="mt-3 text-sm leading-relaxed text-gray-600">Use your Shopify customer account email and password.</p>
       <div className="mt-7 grid grid-cols-2 border-b border-[#dedede]">
-        {(['login', 'signup'] as const).map((tab) => <button className={`border-0 border-b-2 bg-transparent py-3 text-sm font-bold ${mode === tab ? 'border-[#195f3d] text-[#195f3d]' : 'border-transparent text-gray-500'}`} type="button" key={tab} onClick={() => setMode(tab)}>{tab === 'login' ? 'Log in' : 'Sign up'}</button>)}
+        {(['login', 'signup'] as const).map((tab) => <button className={`border-0 border-b-2 bg-transparent py-3 text-sm font-bold ${mode === tab ? 'border-[#183D2B] text-[#183D2B]' : 'border-transparent text-gray-500'}`} type="button" key={tab} onClick={() => setMode(tab)}>{tab === 'login' ? 'Log in' : 'Sign up'}</button>)}
       </div>
       {state.error && <p className="mt-5 border border-red-200 bg-red-50 px-3 py-3 text-sm text-red-700" role="alert">{state.error}</p>}
       {state.success && <p className="mt-5 border border-green-200 bg-green-50 px-3 py-3 text-sm text-green-700" role="status">You are signed in.</p>}
@@ -70,7 +70,7 @@ const countries = [
 
 function PhoneField() {
   return <label className="block text-sm font-semibold text-[#263b4d]" htmlFor="signup-phone">Phone number
-    <div className="mt-2 flex h-12 border border-[#cfd5d8] focus-within:border-[#195f3d]">
+    <div className="mt-2 flex h-12 border border-[#cfd5d8] focus-within:border-[#183D2B]">
       <select className="w-[132px] shrink-0 border-0 border-r border-[#cfd5d8] bg-white px-2 text-sm font-normal outline-none" id="signup-country" name="countryCode" aria-label="Country code" defaultValue="US">
         {countries.map(([code, prefix, flag]) => <option key={code} value={prefix}>{flag} {code} {prefix}</option>)}
       </select>
@@ -80,9 +80,9 @@ function PhoneField() {
 }
 
 function Field({ id, name, label, type = 'text', autoComplete }: { id: string; name: string; label: string; type?: string; autoComplete?: string }) {
-  return <label className="block text-sm font-semibold text-[#263b4d]" htmlFor={id}>{label}<input className="mt-2 h-12 w-full border border-[#cfd5d8] px-3 text-sm font-normal outline-none focus:border-[#195f3d]" id={id} name={name} type={type} autoComplete={autoComplete} required /></label>;
+  return <label className="block text-sm font-semibold text-[#263b4d]" htmlFor={id}>{label}<input className="mt-2 h-12 w-full border border-[#cfd5d8] px-3 text-sm font-normal outline-none focus:border-[#183D2B]" id={id} name={name} type={type} autoComplete={autoComplete} required /></label>;
 }
 
 function SubmitButton({ pending, label }: { pending: boolean; label: string }) {
-  return <button className="h-12 w-full cursor-pointer border-0 bg-[#195f3d] text-sm font-bold text-[#f5c400] disabled:cursor-wait disabled:opacity-60" type="submit" disabled={pending}>{pending ? 'Please wait...' : label}</button>;
+  return <button className="h-12 w-full cursor-pointer border-0 bg-[#183D2B] text-sm font-bold text-[#B59A5A] transition-colors hover:bg-[#3F6B45] disabled:cursor-wait disabled:opacity-60" type="submit" disabled={pending}>{pending ? 'Please wait...' : label}</button>;
 }

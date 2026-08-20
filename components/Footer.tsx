@@ -13,49 +13,49 @@ const policyLinks = ['Shipping Policy', 'Privacy Policy', 'Terms & Conditions', 
 
 export default function Footer() {
     return (
-        <footer className="relative bg-[#303030] px-6 pb-10 pt-16 text-white max-md:px-5 max-md:pt-12" aria-label="Site footer">
+        <footer className="relative bg-[#183D2B] px-6 pb-10 pt-16 text-[#F5F2E9] max-md:px-5 max-md:pt-12" aria-label="Site footer">
             <div className="mx-auto max-w-[1400px]">
                 <div className="grid grid-cols-[1fr_1fr_1fr_1.65fr] gap-12 max-lg:grid-cols-2 max-md:grid-cols-1 max-md:gap-9">
                     <FooterColumn title="Support Center">
                         {supportLinks.map((link) => (
-                            <a className="block w-fit text-[16px] leading-9 text-white no-underline transition-colors hover:text-[#f5c400]" href={link.href} key={link.label}>
+                            <a className="block w-fit text-[16px] leading-9 text-[#F5F2E9] no-underline transition-colors hover:text-[#B59A5A]" href={link.href} key={link.label}>
                                 {link.label}
                             </a>
                         ))}
                     </FooterColumn>
                     <FooterColumn title="Important Links">
                         {importantLinks.map((label) => (
-                            <a className="block w-fit text-[16px] leading-9 text-white no-underline transition-colors hover:text-[#f5c400]" href="/" key={label}>
+                            <a className="block w-fit text-[16px] leading-9 text-[#F5F2E9] no-underline transition-colors hover:text-[#B59A5A]" href="/" key={label}>
                                 {label}
                             </a>
                         ))}
                     </FooterColumn>
                     <FooterColumn title="Our Policies">
                         {policyLinks.map((label) => (
-                            <a className="block w-fit text-[16px] leading-9 text-white no-underline transition-colors hover:text-[#f5c400]" href="/" key={label}>
+                            <a className="block w-fit text-[16px] leading-9 text-[#F5F2E9] no-underline transition-colors hover:text-[#B59A5A]" href="/" key={label}>
                                 {label}
                             </a>
                         ))}
                     </FooterColumn>
                     <FooterColumn title="Company Info">
-                        <p className="m-0 text-[17px] leading-9">
-                            Brand Owned by <strong>Grandeur IT Innovations Private Limited</strong>
+                        <p className="m-0 text-[17px] leading-9 text-[#E7DFCF]">
+                            Brand Owned by <strong className="text-white">Grandeur IT Innovations Private Limited</strong>
                         </p>
-                        <p className="mt-4 text-[17px] leading-9">
-                            <strong>Add:</strong> 208, 2nd Floor SS Plaza, (Opp. Hilton Hotel, Sector 47,
+                        <p className="mt-4 text-[17px] leading-9 text-[#E7DFCF]">
+                            <strong className="text-white">Add:</strong> 208, 2nd Floor SS Plaza, (Opp. Hilton Hotel, Sector 47,
                             <br className="max-md:hidden" /> Gurugram, Haryana 122002
                         </p>
-                        <p className="mt-4 text-[17px] leading-9">
-                            <strong>Add:</strong> 2/666, Sector 2, Vikas Nagar, Lucknow 226022
+                        <p className="mt-4 text-[17px] leading-9 text-[#E7DFCF]">
+                            <strong className="text-white">Add:</strong> 2/666, Sector 2, Vikas Nagar, Lucknow 226022
                         </p>
-                        <p className="mt-4 text-[17px] leading-9">CIN: U72200UP2020PTC127885</p>
+                        <p className="mt-4 text-[17px] leading-9 text-[#E7DFCF]">CIN: U72200UP2020PTC127885</p>
                     </FooterColumn>
                 </div>
 
-                <div className="mt-20 flex items-end justify-between gap-8 max-md:mt-12 max-md:flex-col max-md:items-start">
-                    <p className="m-0 text-[20px]">© 2026 Garden by Zee</p>
+                <div className="mt-20 flex items-end justify-between gap-8 max-md:mt-12 max-md:flex-col max-md:items-start border-t border-[#3F6B45]/40 pt-8">
+                    <p className="m-0 text-[20px] text-[#E7DFCF]">© 2026 Garden by Zee</p>
                     <div>
-                        <p className="m-0 mb-5 text-[20px]">Follow Us</p>
+                        <p className="m-0 mb-5 text-[20px] text-[#F5F2E9]">Follow Us</p>
                         <div className="flex items-center gap-3">
                             <SocialLink label="Facebook" href="https://www.facebook.com" icon={<FacebookIcon />} />
                             <SocialLink label="X" href="https://x.com" icon={<XIcon />} />
@@ -69,7 +69,7 @@ export default function Footer() {
             </div>
 
             <a
-                className="fixed bottom-8 right-9 z-30 flex h-16 w-16 items-center justify-center rounded-full bg-[#14d34d] text-white shadow-lg transition-transform hover:scale-105 max-md:bottom-5 max-md:right-5"
+                className="fixed bottom-8 right-9 z-30 flex h-16 w-16 items-center justify-center rounded-full bg-[#3F6B45] text-white shadow-lg transition-transform hover:scale-105 hover:bg-[#183D2B] max-md:bottom-5 max-md:right-5"
                 href="https://wa.me/99999099909"
                 target="_blank"
                 rel="noreferrer"
