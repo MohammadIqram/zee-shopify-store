@@ -103,6 +103,40 @@ export default function ProductDetailClient({ product, recommendations }: Produc
 
   const activeImage = images[activeImageIndex] || images[0];
 
+  const [showMagnifier, setShowMagnifier] = useState(false);
+  const [[x, y], setXY] = useState([0, 0]);
+  const [[imgWidth, imgHeight], setSizes] = useState([0, 0]);
+
+  const lensWidth = 280; // Big rectangular magnifier!
+  const lensHeight = 200;
+  const zoomLevel = 2.5;
+
+  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    const elem = e.currentTarget;
+    const { width, height } = elem.getBoundingClientRect();
+    setSizes([width, height]);
+    setShowMagnifier(true);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const elem = e.currentTarget;
+    const { top, left } = elem.getBoundingClientRect();
+    const x = e.clientX - left;
+    const y = e.clientY - top;
+    setXY([x, y]);
+  };
+
+  const handleMouseLeave = () => {
+    setShowMagnifier(false);
+  };
+
+  // Compute lens coordinates constrained to the image container bounds
+  const boundedX = Math.max(lensWidth / 2, Math.min(x, imgWidth - lensWidth / 2));
+  const boundedY = Math.max(lensHeight / 2, Math.min(y, imgHeight - lensHeight / 2));
+
+  const lensLeft = boundedX - lensWidth / 2;
+  const lensTop = boundedY - lensHeight / 2;
+
   const handlePincodeCheck = (e: React.FormEvent) => {
     e.preventDefault();
     if (/^\d{6}$/.test(pincode)) {
@@ -175,11 +209,16 @@ export default function ProductDetailClient({ product, recommendations }: Produc
             </div>
 
             {/* Main Image View */}
-            <div className="relative aspect-square flex-1 overflow-hidden border border-gray-100 bg-[#fafafa]">
+            <div 
+              className="relative aspect-square flex-1 overflow-hidden border border-gray-100 bg-[#fafafa] cursor-crosshair"
+              onMouseEnter={handleMouseEnter}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+            >
               {activeImage && (
-                <div className="relative h-full w-full group">
+                <div className="relative h-full w-full">
                   <Image
-                    className="object-contain transition-transform duration-300 group-hover:scale-105"
+                    className="object-contain"
                     src={activeImage.url}
                     alt={activeImage.altText || product.title}
                     fill
@@ -189,9 +228,31 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                 </div>
               )}
               {hasDiscount && (
-                <span className="absolute left-4 top-4 bg-[#195f3d] px-3 py-1.5 text-xs font-bold text-white shadow-sm">
+                <span className="absolute left-4 top-4 bg-[#195f3d] px-3 py-1.5 text-xs font-bold text-white shadow-sm z-10">
                   Save {discount}%
                 </span>
+              )}
+              {/* Magnifier Lens */}
+              {showMagnifier && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    pointerEvents: 'none',
+                    height: `${lensHeight}px`,
+                    width: `${lensWidth}px`,
+                    top: `${lensTop}px`,
+                    left: `${lensLeft}px`,
+                    border: '1px solid #d1d5db',
+                    borderRadius: '4px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                    boxShadow: '0 0 10px rgba(0, 0, 0, 0.15)',
+                    backgroundImage: `url('${activeImage?.url}')`,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: `${imgWidth * zoomLevel}px ${imgHeight * zoomLevel}px`,
+                    backgroundPosition: `-${lensLeft * zoomLevel}px -${lensTop * zoomLevel}px`,
+                    zIndex: 20,
+                  }}
+                />
               )}
             </div>
           </div>
