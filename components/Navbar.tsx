@@ -279,23 +279,23 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
   return (
     <header className="relative bg-[#fafafa] text-gray-800 shadow-sm">
       {/* Top Banner */}
-      <div className="bg-[#195f3d] px-4 py-2 text-center text-xs font-medium tracking-wide text-white max-md:text-[11px] max-md:py-1.5">
+      <div className="bg-[#195f3d] px-4 py-3 text-center text-sm font-medium tracking-wide text-white max-md:text-[13px] max-md:py-2.5">
         Free Shipping Above ₹499 | Fast All India Delivery
       </div>
 
       {/* Main Bar */}
-      <div className="mx-auto flex h-18 max-w-7xl items-center justify-between gap-6 px-6 max-lg:gap-4 max-md:h-auto max-md:flex-wrap max-md:p-3">
+      <div className="mx-auto flex h-[80px] max-w-7xl items-center justify-between gap-6.5 px-6.5 max-lg:gap-4.5 max-md:h-auto max-md:flex-wrap max-md:p-4">
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-5">
           {/* Menu Toggle Button */}
           <button
-            className="flex h-10 items-center justify-center gap-2 rounded border border-gray-300 bg-white px-3.5 text-xs font-semibold text-[#195f3d] transition-colors hover:bg-gray-50 cursor-pointer"
+            className="flex h-12 items-center justify-center gap-2.5 rounded border border-gray-300 bg-white px-4.5 text-sm font-semibold text-[#195f3d] transition-colors hover:bg-gray-50 cursor-pointer"
             type="button"
             aria-expanded={menuOpen}
             aria-controls="main-menu"
             onClick={() => setMenuOpen((open) => !open)}
           >
-            <Menu className="h-4 w-4 text-[#195f3d]" />
+            <Menu className="h-5 w-5 text-[#195f3d]" />
             <span>Menu</span>
           </button>
 
@@ -305,19 +305,19 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
             href="/"
             aria-label="Urban Plant home"
           >
-            <span className="relative block h-9 w-5 -rotate-3 rounded-b-xl rounded-t-xl border-2 border-[#852128] before:absolute before:right-[-6px] before:top-[-6px] before:h-2.5 before:w-2.5 before:rounded-full before:border-2 before:border-[#852128] after:absolute after:bottom-1 after:left-1 after:h-3.5 after:w-2 after:-rotate-12 after:rounded-full after:bg-[#195f3d]" aria-hidden="true">
+            <span className="relative block h-10 w-6 -rotate-3 rounded-b-xl rounded-t-xl border-2 border-[#852128] before:absolute before:right-[-6px] before:top-[-6px] before:h-2.5 before:w-2.5 before:rounded-full before:border-2 before:border-[#852128] after:absolute after:bottom-1 after:left-1 after:h-3.5 after:w-2 after:-rotate-12 after:rounded-full after:bg-[#195f3d]" aria-hidden="true">
               <span className="absolute left-2 top-3 h-2.5 w-1.5 rotate-45 rounded-full bg-[#195f3d]" />
             </span>
-            <span className="text-2xl font-bold tracking-tight text-[#852128] leading-none">
+            <span className="text-[27px] font-bold tracking-tight text-[#852128] leading-none">
               urban<span className="text-[#195f3d]">plant</span>
-              <sup className="ml-0.5 text-[9px] font-normal">®</sup>
+              <sup className="ml-0.5 text-[10px] font-normal">®</sup>
             </span>
           </Link>
         </div>
 
         {/* Search Bar */}
         <form
-          className="search-container relative flex h-10 max-w-xl flex-1 items-center rounded border border-gray-300 bg-white max-md:order-3 max-md:w-full max-md:max-w-none"
+          className="search-container relative flex h-12 max-w-xl flex-1 items-center rounded border border-gray-300 bg-white max-md:order-3 max-md:w-full max-md:max-w-none"
           role="search"
           onSubmit={(event) => event.preventDefault()}
         >
@@ -331,25 +331,25 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
               setSearchFocused(true);
             }}
             onFocus={() => setSearchFocused(true)}
-            className="w-full border-0 bg-transparent px-3 text-xs text-gray-800 outline-none placeholder:text-gray-400 rounded-l"
+            className="w-full border-0 bg-transparent px-4 text-sm text-gray-800 outline-none placeholder:text-gray-400 rounded-l"
           />
           <div className="categories-dropdown-container relative h-full flex items-center max-lg:hidden">
             <button
-              className="flex h-full items-center gap-1.5 border-0 border-l border-gray-200 bg-transparent px-3 text-xs text-gray-600 hover:text-gray-900 whitespace-nowrap cursor-pointer"
+              className="flex h-full items-center gap-2 border-0 border-l border-gray-200 bg-transparent px-4 text-sm text-gray-600 hover:text-gray-900 whitespace-nowrap cursor-pointer"
               type="button"
               onClick={() => setCategoriesDropdownOpen(!categoriesDropdownOpen)}
             >
-              All categories <ChevronDown className="h-3 w-3 text-gray-500" />
+              All categories <ChevronDown className="h-4 w-4 text-gray-500" />
             </button>
             {categoriesDropdownOpen && (
-              <div className="absolute right-0 top-full z-50 mt-1 w-[480px] bg-white border border-gray-200 shadow-2xl rounded-md flex overflow-hidden">
+              <div className="absolute right-0 top-full z-50 mt-1 w-[520px] bg-white border border-gray-200 shadow-2xl rounded-md flex overflow-hidden">
                 {/* Left Sidebar - Parent Categories */}
-                <div className="w-[170px] bg-gray-50 border-r border-gray-100 flex flex-col max-h-[360px] overflow-y-auto">
+                <div className="w-[190px] bg-gray-50 border-r border-gray-100 flex flex-col max-h-[400px] overflow-y-auto">
                   {hierarchy.map((parent, idx) => (
                     <button
                       key={`${parent.title}-${idx}`}
                       type="button"
-                      className={`w-full text-left px-4 py-3 text-xs transition-colors border-l-4 cursor-pointer flex items-center justify-between ${idx === activeParentIdx
+                      className={`w-full text-left px-4.5 py-4 text-sm transition-colors border-l-4 cursor-pointer flex items-center justify-between ${idx === activeParentIdx
                           ? 'bg-white text-[#195f3d] font-bold border-l-[#195f3d]'
                           : 'border-l-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                         }`}
@@ -357,22 +357,22 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
                     >
                       <span className="truncate">{parent.title}</span>
                       {parent.subcategories.length > 0 && (
-                        <ChevronRight className="h-3 w-3 flex-none text-gray-400" />
+                        <ChevronRight className="h-4 w-4 flex-none text-gray-400" />
                       )}
                     </button>
                   ))}
                 </div>
                 {/* Right Content - Sub Categories */}
-                <div className="flex-1 p-5 min-h-[240px] max-h-[360px] overflow-y-auto flex flex-col justify-between">
+                <div className="flex-1 p-6 min-h-[260px] max-h-[400px] overflow-y-auto flex flex-col justify-between">
                   <div>
                     <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#195f3d]">
+                      <span className="text-[13px] font-bold uppercase tracking-wider text-[#195f3d]">
                         {hierarchy[activeParentIdx]?.title}
                       </span>
                       {hierarchy[activeParentIdx]?.handle && (
                         <Link
                           href={`/collections/${hierarchy[activeParentIdx].handle}`}
-                          className="text-[11px] font-semibold text-[#195f3d] hover:underline"
+                          className="text-[13px] font-semibold text-[#195f3d] hover:underline"
                           onClick={() => setCategoriesDropdownOpen(false)}
                         >
                           View all
@@ -380,12 +380,12 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
                       )}
                     </div>
                     {hierarchy[activeParentIdx]?.subcategories && hierarchy[activeParentIdx].subcategories.length > 0 ? (
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                         {hierarchy[activeParentIdx].subcategories.map((sub) => (
                           <Link
                             key={sub.handle}
                             href={`/collections/${sub.handle}`}
-                            className="text-xs text-gray-600 hover:text-[#195f3d] hover:font-semibold transition-colors flex items-center gap-1.5 py-1"
+                            className="text-sm text-gray-600 hover:text-[#195f3d] hover:font-semibold transition-colors flex items-center gap-2 py-1"
                             onClick={() => setCategoriesDropdownOpen(false)}
                           >
                             <span className="h-1.5 w-1.5 rounded-full bg-[#195f3d] flex-none" />
@@ -394,7 +394,7 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
                         ))}
                       </div>
                     ) : (
-                      <p className="text-xs text-gray-500 py-4 text-center">
+                      <p className="text-sm text-gray-500 py-4 text-center">
                         Browse all items in{' '}
                         <Link
                           href={`/collections/${hierarchy[activeParentIdx]?.handle}`}
@@ -410,15 +410,15 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
               </div>
             )}
           </div>
-          <button className="flex h-full w-10 flex-none items-center justify-center bg-[#195f3d] text-white transition-colors hover:bg-emerald-800 cursor-pointer rounded-r" type="submit" aria-label="Search">
-            <Search className="h-4 w-4" />
+          <button className="flex h-full w-12 flex-none items-center justify-center bg-[#195f3d] text-white transition-colors hover:bg-emerald-800 cursor-pointer rounded-r" type="submit" aria-label="Search">
+            <Search className="h-5 w-5" />
           </button>
 
           {/* Search Results Dropdown */}
           {searchFocused && query.trim().length >= 2 && (
-            <div className="absolute left-0 right-0 top-full z-[60] mt-1 max-h-[300px] overflow-y-auto rounded-md border border-gray-200 bg-white shadow-2xl py-1">
+            <div className="absolute left-0 right-0 top-full z-[60] mt-1 max-h-[340px] overflow-y-auto rounded-md border border-gray-200 bg-white shadow-2xl py-1">
               {searchLoading ? (
-                <div className="px-4 py-3 text-xs text-gray-500 text-center">Loading search results...</div>
+                <div className="px-4 py-3.5 text-sm text-gray-500 text-center">Loading search results...</div>
               ) : searchResults.length > 0 ? (
                 searchResults.map((product) => {
                   const image = product.images?.edges?.[0]?.node;
@@ -426,20 +426,20 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
                     <Link
                       key={product.id}
                       href={`/products/${product.handle}`}
-                      className="flex items-center gap-3 px-4 py-2 hover:bg-emerald-50 text-xs text-gray-700 hover:text-[#195f3d] no-underline transition-colors cursor-pointer border-b border-gray-50 last:border-b-0"
+                      className="flex items-center gap-3.5 px-4.5 py-3 hover:bg-emerald-50 text-sm text-gray-700 hover:text-[#195f3d] no-underline transition-colors cursor-pointer border-b border-gray-50 last:border-b-0"
                       onClick={() => {
                         setSearchFocused(false);
                         setQuery('');
                       }}
                     >
-                      <div className="relative h-8 w-8 flex-none overflow-hidden rounded-full border border-gray-200 bg-white">
+                      <div className="relative h-9 w-9 flex-none overflow-hidden rounded-full border border-gray-200 bg-white">
                         {image ? (
                           <Image
                             className="object-cover"
                             src={image.url}
                             alt={image.altText || product.title}
                             fill
-                            sizes="32px"
+                            sizes="36px"
                           />
                         ) : (
                           <div className="h-full w-full bg-gray-100 flex items-center justify-center text-[10px] text-gray-400">?</div>
@@ -450,26 +450,26 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
                   );
                 })
               ) : (
-                <div className="px-4 py-3 text-xs text-gray-500 text-center">No products found.</div>
+                <div className="px-4 py-3.5 text-sm text-gray-500 text-center">No products found.</div>
               )}
             </div>
           )}
         </form>
 
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-6">
           {/* Account Link */}
           <a
-            className="flex flex-col border-r border-gray-300 pr-5 text-right no-underline max-md:border-0 max-md:p-0"
+            className="flex flex-col border-r border-gray-300 pr-6 text-right no-underline max-md:border-0 max-md:p-0"
             href="/account"
           >
-            <span className="text-[10px] text-gray-500">{customerName || 'Login / Signup'}</span>
-            <span className="text-xs font-semibold text-[#195f3d]">My Account</span>
+            <span className="text-xs text-gray-500">{customerName || 'Login / Signup'}</span>
+            <span className="text-sm font-semibold text-[#195f3d]">My Account</span>
           </a>
 
           {/* Cart Link */}
           <div className="relative">
             <button
-              className="relative flex cursor-pointer items-center gap-2 border-0 bg-transparent text-xs font-bold text-[#195f3d] no-underline"
+              className="relative flex cursor-pointer items-center gap-2.5 border-0 bg-transparent text-sm font-bold text-[#195f3d] no-underline"
               type="button"
               aria-expanded={cartOpen}
               aria-controls="cart-popover"
@@ -477,8 +477,8 @@ export default function Navbar({ categories, menuItems, customerName }: NavbarPr
               onClick={() => setCartOpen((open) => !open)}
             >
               <div className="relative">
-                <ShoppingBag className="h-5 w-5 text-[#195f3d]" />
-                <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#050505] text-[10px] font-medium text-white">
+                <ShoppingBag className="h-6 w-6 text-[#195f3d]" />
+                <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#050505] text-[11px] font-medium text-white">
                   {itemCount}
                 </span>
               </div>
