@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
+import { useCart } from '@/components/CartProvider';
 
 export interface CollectionProduct {
   id: string;
@@ -38,6 +39,7 @@ const formatPrice = (amount: string, currencyCode: string) =>
   new Intl.NumberFormat('en-IN', { style: 'currency', currency: currencyCode, maximumFractionDigits: 2 }).format(Number(amount));
 
 function QuickViewModal({ product, onClose }: { product: CollectionProduct; onClose: () => void }) {
+  const { addItem } = useCart();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const image = product.images.edges[activeImageIndex]?.node;
   const variants = product.variants.edges.map(({ node }) => node);
@@ -118,7 +120,18 @@ function QuickViewModal({ product, onClose }: { product: CollectionProduct; onCl
               <button className="flex h-[40px] min-w-[41px] cursor-pointer items-center justify-center border-0 bg-transparent text-[20px]" type="button" onClick={() => setQuantity((value) => value + 1)}>+</button>
             </div>
           </div>
-          <button className="mt-[26px] h-[48px] w-full cursor-pointer border-0 bg-[#195f3d] text-[14px] font-bold text-[#f5c400]" type="button">Add to cart</button>
+          <button
+            className="mt-[26px] h-[48px] w-full cursor-pointer border-0 bg-[#195f3d] text-[14px] font-bold text-[#f5c400]"
+            type="button"
+            disabled={!selectedVariant?.availableForSale}
+            onClick={() => {
+              if (!selectedVariant) return;
+              addItem({ variantId: selectedVariant.id, productId: product.id, title: product.title, variantTitle: selectedVariant.title, price: price.amount, currencyCode: price.currencyCode, imageUrl: image?.url, imageAlt: image?.altText || product.title, compareAtPrice: compareAt.amount }, quantity);
+              onClose();
+            }}
+          >
+            {selectedVariant?.availableForSale === false ? 'Sold out' : 'Add to cart'}
+          </button>
         </div>
       </div>
     </div>
@@ -126,6 +139,7 @@ function QuickViewModal({ product, onClose }: { product: CollectionProduct; onCl
 }
 
 function ProductCard({ product, onQuickView }: { product: CollectionProduct; onQuickView: (product: CollectionProduct) => void }) {
+  const { addItem } = useCart();
   const image = product.images.edges[0]?.node;
   const price = product.priceRange.minVariantPrice;
   const compareAt = product.compareAtPriceRange.minVariantPrice;
@@ -150,7 +164,18 @@ function ProductCard({ product, onQuickView }: { product: CollectionProduct; onQ
       <div className="my-[12px] mb-[24px] text-[17px] text-[#aaa]" aria-label="No reviews yet">
         <span className="tracking-[1px]">★★★★★</span> <small className="ml-[7px] text-[12px] tracking-normal text-[#555]">No reviews</small>
       </div>
-      <button className="mt-auto h-[45px] cursor-pointer border border-[#195f3d] bg-[#195f3d] text-[13px] font-bold text-[#f5c400]" type="button">Add to cart</button>
+      <button
+        className="mt-auto h-[45px] cursor-pointer border border-[#195f3d] bg-[#195f3d] text-[13px] font-bold text-[#f5c400] disabled:cursor-not-allowed disabled:opacity-50"
+        type="button"
+        disabled={!product.variants.edges[0]?.node.availableForSale}
+        onClick={() => {
+          const variant = product.variants.edges[0]?.node;
+          if (!variant) return;
+          addItem({ variantId: variant.id, productId: product.id, title: product.title, variantTitle: variant.title, price: variant.price.amount, currencyCode: variant.price.currencyCode, imageUrl: image?.url, imageAlt: image?.altText || product.title, compareAtPrice: compareAt.amount });
+        }}
+      >
+        {product.variants.edges[0]?.node.availableForSale === false ? 'Sold out' : 'Add to cart'}
+      </button>
       <button className="mt-[10px] h-[45px] cursor-pointer border border-[#ddd] bg-transparent text-[13px] font-bold text-[#195f3d]" type="button" onClick={() => onQuickView(product)}>Quick view</button>
     </article>
   );

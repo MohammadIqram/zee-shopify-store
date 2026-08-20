@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Menu, Search, ShoppingBag, ChevronRight, ChevronDown } from 'lucide-react';
+import { useCart } from '@/components/CartProvider';
 
 export interface NavigationItem {
   title: string;
@@ -44,6 +45,10 @@ function NavigationItems({ items }: { items: NavigationItem[] }) {
 export default function Navbar({ categories }: { categories: CollectionCategory[] }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [cartOpen, setCartOpen] = useState(false);
+  const { items, itemCount, updateQuantity, removeItem } = useCart();
+  const cartTotal = items.reduce((total, item) => total + Number(item.price) * item.quantity, 0);
+  const currencyCode = items[0]?.currencyCode || 'INR';
 
   return (
     <header className="relative bg-[#fafafa] text-gray-800 shadow-sm">
@@ -117,19 +122,64 @@ export default function Navbar({ categories }: { categories: CollectionCategory[
           </a>
 
           {/* Cart Link */}
-          <a 
-            className="relative flex items-center gap-2 text-xs font-bold text-[#195f3d] no-underline" 
-            href="/cart" 
-            aria-label="Cart"
-          >
+          <div className="relative">
+            <button
+              className="relative flex cursor-pointer items-center gap-2 border-0 bg-transparent text-xs font-bold text-[#195f3d] no-underline"
+              type="button"
+              aria-expanded={cartOpen}
+              aria-controls="cart-popover"
+              aria-label={`Cart, ${itemCount} item${itemCount === 1 ? '' : 's'}`}
+              onClick={() => setCartOpen((open) => !open)}
+            >
             <div className="relative">
               <ShoppingBag className="h-5 w-5 text-[#195f3d]" />
               <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#050505] text-[10px] font-medium text-white">
-                1
+                {itemCount}
               </span>
             </div>
             <span className="max-md:hidden">Cart</span>
-          </a>
+            </button>
+            {cartOpen && (
+              <div id="cart-popover" className="absolute right-0 top-full z-30 mt-3 w-[min(360px,calc(100vw-32px))] border border-gray-200 bg-white p-4 text-left shadow-xl">
+                <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                  <h2 className="m-0 text-sm font-bold text-gray-900">Your cart</h2>
+                  <span className="text-xs text-gray-500">{itemCount} item{itemCount === 1 ? '' : 's'}</span>
+                </div>
+                {items.length === 0 ? (
+                  <p className="m-0 py-6 text-center text-sm text-gray-500">Your cart is empty.</p>
+                ) : (
+                  <>
+                    <ul className="m-0 max-h-64 list-none divide-y divide-gray-100 overflow-y-auto p-0">
+                      {items.map((item) => (
+                        <li className="py-3" key={item.variantId}>
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="m-0 text-sm font-semibold text-gray-800">{item.title}</p>
+                              {item.variantTitle !== 'Default Title' && <p className="m-0 mt-1 text-xs text-gray-500">{item.variantTitle}</p>}
+                              <p className="m-0 mt-1 text-xs text-[#195f3d]">{item.price} {item.currencyCode}</p>
+                            </div>
+                            <button className="cursor-pointer border-0 bg-transparent p-0 text-xs text-gray-500 underline" type="button" onClick={() => removeItem(item.variantId)}>Remove</button>
+                          </div>
+                          <div className="mt-2 flex items-center gap-3">
+                            <button className="flex h-6 w-6 cursor-pointer items-center justify-center border border-gray-200 bg-white" type="button" aria-label={`Decrease ${item.title} quantity`} onClick={() => updateQuantity(item.variantId, item.quantity - 1)}>−</button>
+                            <span className="min-w-4 text-center text-xs">{item.quantity}</span>
+                            <button className="flex h-6 w-6 cursor-pointer items-center justify-center border border-gray-200 bg-white" type="button" aria-label={`Increase ${item.title} quantity`} onClick={() => updateQuantity(item.variantId, item.quantity + 1)}>+</button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-sm font-bold text-gray-900">
+                      <span>Total</span>
+                      <span>{new Intl.NumberFormat('en-IN', { style: 'currency', currency: currencyCode }).format(cartTotal)}</span>
+                    </div>
+                    <Link className="mt-4 block w-full bg-[#195f3d] px-4 py-3 text-center text-sm font-bold text-[#f5c400] no-underline transition-colors hover:bg-[#124b30]" href="/cart" onClick={() => setCartOpen(false)}>
+                      Go to cart
+                    </Link>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

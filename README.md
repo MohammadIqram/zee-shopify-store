@@ -14,8 +14,11 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
+## Shopify customer account setup
+
+Copy `.env.example` to `.env.local` and set the Shopify Storefront credentials. The account page uses Shopify's Storefront API customer mutations for email/password login and signup. Shopify returns a customer access token, which the server action stores in an HTTP-only cookie.
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
