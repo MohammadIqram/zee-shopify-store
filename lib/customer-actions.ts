@@ -96,6 +96,11 @@ export async function loginCustomer(_previousState: ActionResult, formData: Form
   return result;
 }
 
+export async function logoutCustomer() {
+  (await cookies()).delete(customerSessionCookie);
+  redirect('/account');
+}
+
 export async function createCustomer(_previousState: ActionResult, formData: FormData): Promise<ActionResult> {
   const firstName = String(formData.get('firstName') || '').trim();
   const lastName = String(formData.get('lastName') || '').trim();

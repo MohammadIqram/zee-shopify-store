@@ -6,6 +6,7 @@ import CategoryList from '@/components/CategoryList';
 import CollectionBrowser, { type CollectionFilter, type CollectionProduct } from '@/components/CollectionBrowser';
 import { getCollectionQuery, getNavigationQuery } from '@/lib/queries';
 import { shopifyFetch } from '@/lib/shopify';
+import { getCustomerName } from '@/lib/customer-session';
 
 interface CollectionData {
   collection: {
@@ -22,9 +23,10 @@ interface NavigationData {
 
 export default async function CollectionPage({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params;
-  const [{ data: collectionData }, { data: navigation }] = await Promise.all([
+  const [{ data: collectionData }, { data: navigation }, customerName] = await Promise.all([
     shopifyFetch<CollectionData>({ query: getCollectionQuery, variables: { handle } }),
     shopifyFetch<NavigationData>({ query: getNavigationQuery }),
+    getCustomerName(),
   ]);
 
   if (!collectionData?.collection) notFound();
@@ -34,7 +36,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ han
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
-      <Navbar categories={categories} />
+      <Navbar categories={categories} customerName={customerName} />
       <CategoryList categories={categories} />
 
       <main className="mx-auto max-w-7xl px-6 py-8 max-md:px-4 max-md:py-5">

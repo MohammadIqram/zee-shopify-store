@@ -3,6 +3,7 @@ import { getNavigationQuery, getProductsQuery } from '@/lib/queries';
 import Image from 'next/image';
 import Navbar from '@/components/Navbar';
 import CategoryList from '@/components/CategoryList';
+import { getCustomerName } from '@/lib/customer-session';
 
 interface ProductNode {
   id: string;
@@ -33,13 +34,14 @@ export default async function HomePage() {
     shopifyFetch<{ products: { edges: { node: ProductNode }[] } }>({ query: getProductsQuery }),
     shopifyFetch<NavigationData>({ query: getNavigationQuery }),
   ]);
+  const customerName = await getCustomerName();
 
   const products = data?.products?.edges || [];
   const categories = navigation?.collections?.edges.map(({ node }) => node) || [];
 
   return (
     <>
-      <Navbar categories={categories} />
+      <Navbar categories={categories} customerName={customerName} />
       <CategoryList categories={categories} />
       <main className="max-w-7xl mx-auto px-4 py-12">
         <h1 className="text-3xl font-bold mb-8">Products from Shopify</h1>

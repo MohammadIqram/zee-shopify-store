@@ -42,7 +42,7 @@ function NavigationItems({ items }: { items: NavigationItem[] }) {
   );
 }
 
-export default function Navbar({ categories }: { categories: CollectionCategory[] }) {
+export default function Navbar({ categories, customerName }: { categories: CollectionCategory[]; customerName?: string | null }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [cartOpen, setCartOpen] = useState(false);
@@ -117,7 +117,7 @@ export default function Navbar({ categories }: { categories: CollectionCategory[
             className="flex flex-col border-r border-gray-300 pr-5 text-right no-underline max-md:border-0 max-md:p-0" 
             href="/account"
           >
-            <span className="text-[10px] text-gray-500 max-md:hidden">Login / Signup</span>
+            <span className="text-[10px] text-gray-500">{customerName || 'Login / Signup'}</span>
             <span className="text-xs font-semibold text-[#195f3d]">My Account</span>
           </a>
 
